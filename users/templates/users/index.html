@@ -63,24 +63,29 @@
                 <div class="form-group">
                     {{form.fullName}}
                     <i class="bi bi-people"></i>
+                    <div class="error-text text-danger" id="fullName-error"></div>
                 </div>
                 <div class="form-group">
                     {{form.phoneNumber}}
                     <i class="bi bi-telephone"></i>
+                    <div class="error-text text-danger" id="phoneNumber-error"></div>
                 </div>
                 <div class="form-group">
                     {{form.email}}
                     <i class="bi bi-envelope"></i>
+                    <div class="error-text text-danger" id="email-error"></div>
                 </div>
                 <div class="form-group">
                     {{form.password}}
                     <i class="bi bi-lock"></i>
+                    <div class="error-text text-danger" id="password-error"></div>
                 </div>
                 <div class="form-group">
                     {{form.rePassword}}
                     <i class="bi bi-lock"></i>
+                    <div class="error-text text-danger" id="rePassword-error"></div>
                 </div>
-                
+                <div class="error-text text-danger" id="form-error"></div>
                 <button type="submit" class="auth-btn">ثبت نام</button>
             </form>
         </div>

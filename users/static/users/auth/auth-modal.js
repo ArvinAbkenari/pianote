@@ -64,11 +64,36 @@ $(document).ready(function() {
         bootstrapToast.show();
     }
 
+
+
+    
+    function displayFormErrors(errors) {
+        // Clear previous error messages
+        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+    
+        if (errors) {
+            // Loop through errors and update the relevant error elements
+            for (const [field, messages] of Object.entries(errors)) {
+                const errorElement = document.getElementById(`${field}-error`);
+                if (errorElement) {
+                    errorElement.textContent = messages.join(', ');
+                } else if (field === '__all__') {
+                    // For non-field errors, display them in a general error container
+                    const generalError = document.getElementById('form-error');
+                    if (generalError) {
+                        generalError.textContent = messages.join(', ');
+                    }
+                }
+            }
+        }
+    }
+    
+
     document.getElementById('signupForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the default form submission
-
+    
         const formData = new FormData(this);
-
+    
         fetch(this.action, {
             method: 'POST',
             body: formData,
@@ -77,18 +102,18 @@ $(document).ready(function() {
             }
         })
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Network response was not ok');
-            }
+            return response.json().then(data => {
+                return { ok: response.ok, data };
+            });
         })
-        .then(data => {
-            if (data.success) {
+        .then(({ ok, data }) => {
+            if (ok && data.success) {
                 showToast('موفقیت', 'ثبت نام با موفقیت انجام شد!', true);
                 this.reset();
+                displayFormErrors({}); // Clear all errors on success
             } else {
-                showToast('خطا', 'ثبت نام ناموفق: ' + data.error, false);
+                showToast('خطا', 'ثبت نام ناموفق. لطفاً خطاها را بررسی کنید.', false);
+                displayFormErrors(data.errors); // Display errors automatically
             }
         })
         .catch(error => {
