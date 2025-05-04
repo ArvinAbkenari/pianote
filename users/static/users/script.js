@@ -132,4 +132,13 @@ $(document).ready(function() {
         }
     });
 
+    // Ensure dropdowns don't interfere with page scrollability
+    $(document).on('show.bs.dropdown', function () {
+        $('body').css('overflow', 'auto');
+    });
+
+    $(document).on('hide.bs.dropdown', function () {
+        $('body').css('overflow', 'auto');
+    });
+
 });

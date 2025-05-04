@@ -139,6 +139,9 @@ $(document).ready(function() {
             if (response.ok) {
                 showToast('موفقیت', 'ورود با موفقیت انجام شد!', true);
                 this.reset();
+                if (data.reload) {
+                    location.reload();
+                }
             } else {
                 const errorMsg = data.error || Object.values(data.errors || {}).flat().join(', ') || 'رمز ورود یا نام کاربری اشتباه است!';
                 showToast('خطا!', 'ورود ناموفق: ' + errorMsg, false);

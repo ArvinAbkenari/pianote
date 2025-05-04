@@ -122,7 +122,11 @@ body {
     height: 2.5rem;
     border-radius: 50%;
 }
+.profile-div{
+    padding-left:60px !important;
+    padding-right:60px !important;
 
+}
 .theme-toggle:hover,
 .profile-icon:hover {
     color: var(--accent-color);

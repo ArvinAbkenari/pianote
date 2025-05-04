@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
+from django.urls import reverse
 from users.models import User
 from .forms import UserSignupForm
 from .forms import UserSigninForm
@@ -33,8 +34,10 @@ def signin_view(request):
             password = form.cleaned_data['password']
             try:
                 user = User.objects.get(email=email, password=password)
-                request.session['user_id'] = user.id  
-                return JsonResponse({'success': True})
+                request.session['user_id'] = user.id 
+                request.session['fullName'] = user.fullName.split()[0]
+                name = "KireKhar"
+                return JsonResponse({'success': True, 'reload': True}) 
             except User.DoesNotExist:
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         else:
@@ -43,3 +46,6 @@ def signin_view(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method.'}, status=405)
 
 
+def logout_view(request):
+    request.session.flush()
+    return HttpResponseRedirect(reverse('HomePage'))
