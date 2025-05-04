@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <clipPath id="circleClip">
+      <circle cx="400" cy="300" r="280"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circleClip)">
+    <!-- Piano silhouette -->
+    <rect x="100" y="250" width="600" height="200" fill="#1a1a1a"/>
+    <!-- Pianist silhouette -->
+    <path d="M400 150 C450 150,500 200,500 300 C500 400,450 450,400 450 C350 450,300 400,300 300 C300 200,350 150,400 150" fill="#2c2c2c"/>
+    <!-- Arms reaching -->
+    <path d="M400 300 C450 300,550 250,600 200" stroke="#2c2c2c" stroke-width="40" fill="none"/>
+  </g>
+  <!-- Background circle -->
+  <circle cx="400" cy="300" r="280" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+</svg>

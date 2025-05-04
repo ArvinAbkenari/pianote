@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <style>
+    .piano-key { fill: #3182CE; }
+  </style>
+  <g transform="translate(4, 24) scale(0.8)">
+    <path class="piano-key" d="M0,0 h15 v-25 h-5 v15 h-10 z" opacity="0.9"/>
+    <path class="piano-key" d="M17,0 h15 v-25 h-5 v15 h-10 z" opacity="0.7"/>
+  </g>
+</svg>

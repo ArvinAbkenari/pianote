@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <style>.logo-text { font-family: &#x27;Vazirmatn&#x27;, sans-serif; font-weight: 700; }
+    .piano-key { transition: transform 0.3s ease; }
+    .piano-key:hover { transform: translateY(-2px); }</style>
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="svg_1">
+   <path class="piano-key" d="m10,35l15,0l0,-25l-5,0l0,15l-10,0l0,10z" fill="#3182CE" id="svg_2"/>
+   <path class="piano-key" d="m27,35l15,0l0,-25l-5,0l0,15l-10,0l0,10z" fill="#3182CE" id="svg_3" opacity="0.8"/>
+   <text class="logo-text" fill="#ffffff" font-size="28" id="svg_4" x="56" y="35">پیانوت</text>
+  </g>
+ </g>
+</svg>

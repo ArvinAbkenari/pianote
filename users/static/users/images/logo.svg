@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <style>
+    .logo-text { font-family: 'Vazirmatn', sans-serif; font-weight: 700; }
+    .piano-key { transition: transform 0.3s ease; }
+    .piano-key:hover { transform: translateY(-2px); }
+  </style>
+  <g transform="translate(10, 35)">
+    <path class="piano-key" d="M0,0 h15 v-25 h-5 v15 h-10 z" fill="#3182CE"/>
+    <path class="piano-key" d="M17,0 h15 v-25 h-5 v15 h-10 z" fill="#3182CE" opacity="0.8"/>
+    <text x="45" y="0" class="logo-text" fill="#2D3436" font-size="28">پیانوت</text>
+  </g>
+</svg>

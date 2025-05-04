@@ -1,0 +1,258 @@
+:root {
+    --modal-bg: rgba(255, 255, 255, 0.95);
+    --modal-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.8);
+    --input-border: #E2E8F0;
+    --input-focus: #3182CE;
+    --btn-hover: #2B6CB0;
+    --social-btn-bg: #F7FAFC;
+    --social-btn-hover: #EDF2F7;
+}
+
+[data-theme="dark"] {
+    --modal-bg: rgba(26, 32, 44, 0.95);
+    --modal-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --input-bg: rgba(45, 55, 72, 0.8);
+    --input-border: #4A5568;
+    --input-focus: #63B3ED;
+    --social-btn-bg: #2D3748;
+    --social-btn-hover: #4A5568;
+}
+
+.modal-open {
+    overflow: hidden;
+}
+
+.auth-modal {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.3s, opacity 0.3s ease;
+}
+
+.auth-modal.show {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.3s ease;
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+    background: var(--modal-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--modal-shadow);
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.auth-modal.show .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: var(--accent-color);
+}
+
+.modal-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+}
+
+.tab-btn.active::after {
+    transform: scaleX(1);
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    outline: none;
+}
+
+.form-group i {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: var(--btn-hover);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-btn:hover {
+    background: var(--btn-hover);
+}
+
+.social-auth {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.social-auth p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.social-auth p::before,
+.social-auth p::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 25%;
+    height: 1px;
+    background: var(--input-border);
+}
+
+.social-auth p::before {
+    right: 0;
+}
+
+.social-auth p::after {
+    left: 0;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--input-border);
+    border-radius: 50%;
+    background: var(--social-btn-bg);
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    background: var(--social-btn-hover);
+    transform: translateY(-2px);
+}
