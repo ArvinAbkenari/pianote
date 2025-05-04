@@ -26,15 +26,15 @@
             </div>
             
             <!-- Sign In Form -->
-            <form method="POST" id="signinForm" class="auth-form active">
+            <form method="post" action="{% url 'signin' %}" id="signinForm" class="auth-form active">
                 {% csrf_token %}
                 <div class="form-group">
-                    <input type="email" placeholder="ایمیل" >
+                    {{form.email}}
                     <i class="bi bi-envelope"></i>
                 </div>
                 <div class="form-group">
-                    <input type="password" placeholder="رمز عبور" >
-                    <i class="bi bi-lock"></i>
+                    {{form.password}}
+                    <i class="bi bi-envelope"></i>
                 </div>
                 <div class="form-options">
                     <label class="remember-me">
@@ -61,20 +61,12 @@
             <form method="post" action="{% url 'signup' %}" id="signupForm" class="auth-form">
                 {% csrf_token %}
                 <div class="form-group">
-                    {{form.firstName}}
-                    <i class="bi bi-people"></i>
-                </div>
-                <div class="form-group">
-                    {{form.lastName}}
+                    {{form.fullName}}
                     <i class="bi bi-people"></i>
                 </div>
                 <div class="form-group">
                     {{form.phoneNumber}}
                     <i class="bi bi-telephone"></i>
-                </div>
-                <div class="form-group">
-                    {{form.username}}
-                    <i class="bi bi-person"></i>
                 </div>
                 <div class="form-group">
                     {{form.email}}

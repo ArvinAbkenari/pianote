@@ -96,4 +96,33 @@ $(document).ready(function() {
             showToast('خطا', 'مشکلی در درخواست ثبت نام وجود داشت.', false);
         });
     });
+
+    document.getElementById('signinForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (response.ok) {
+                showToast('موفقیت', 'ورود با موفقیت انجام شد!', true);
+                this.reset();
+            } else {
+                const errorMsg = data.error || Object.values(data.errors || {}).flat().join(', ') || 'رمز ورود یا نام کاربری اشتباه است!';
+                showToast('خطا!', 'ورود ناموفق: ' + errorMsg, false);
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the signin request:', error);
+            showToast('خطا', 'مشکلی در درخواست ورود وجود داشت.', false);
+        });
+        
+    });
 });

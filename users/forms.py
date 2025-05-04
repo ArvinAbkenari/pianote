@@ -6,14 +6,12 @@ from django.utils import timezone
 class UserSignupForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'password', 'rePassword', 'email', 'firstName', 'lastName', 'phoneNumber']
+        fields = ['password', 'rePassword', 'email', 'fullName', 'phoneNumber']
         widgets = {
-            'username': forms.TextInput(attrs={'placeholder': 'نام کاربری', 'class': 'form-control', 'required': True, }),
             'password': forms.PasswordInput(attrs={'placeholder': 'رمز عبور', 'class': 'form-control', 'required': True, }),
             'rePassword': forms.PasswordInput(attrs={'placeholder': 'تکرار رمز عبور', 'class': 'form-control', 'required': True,}),
             'email': forms.EmailInput(attrs={'placeholder': 'ایمیل', 'class': 'form-control', 'required': True, 'style': 'direction: rtl;'}),
-            'firstName': forms.TextInput(attrs={'placeholder': 'نام', 'class': 'form-control', 'required': True, }),
-            'lastName': forms.TextInput(attrs={'placeholder': 'نام خانوادگی', 'class': 'form-control', 'required': True, }),
+            'fullName': forms.TextInput(attrs={'placeholder': 'نام', 'class': 'form-control', 'required': True, }),
             'phoneNumber': forms.TextInput(attrs={'placeholder': 'شماره تماس', 'class': 'form-control', 'required': True,}),
         }
 
@@ -34,5 +32,5 @@ class UserSignupForm(forms.ModelForm):
 
 
 class UserSigninForm(forms.Form):
-    username = forms.CharField(max_length=150)
+    email = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
