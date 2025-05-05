@@ -80,6 +80,7 @@ class UserSignupForm(forms.ModelForm):
         user.id = str(ObjectId())
         user.createdDate = timezone.now()
         user.premiumDate = timezone.now()
+        user.isSuperUser = False
         user.deleteFlag = False
         if commit:
             user.save()

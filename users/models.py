@@ -13,6 +13,7 @@ class User(models.Model):
     phoneNumber = models.CharField(max_length=20)
     premiumDate = models.DateTimeField()
     createdDate = models.DateTimeField()
+    isSuperUser = models.BooleanField(default=False)
     deleteFlag = models.BooleanField(default=False)
 
     def __str__(self):

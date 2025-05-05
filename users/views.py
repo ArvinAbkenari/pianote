@@ -36,7 +36,6 @@ def signin_view(request):
                 user = User.objects.get(email=email, password=password)
                 request.session['user_id'] = user.id 
                 request.session['fullName'] = user.fullName.split()[0]
-                name = "KireKhar"
                 return JsonResponse({'success': True, 'reload': True}) 
             except User.DoesNotExist:
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
