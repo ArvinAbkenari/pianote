@@ -28,4 +28,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('about-us/', views.aboutus_view, name='aboutus'),
     path('notes/', notes_view.notes_view, name='notes'),
+    path("ajax/search/", notes_view.ajax_search, name="ajax_search"),
 ]

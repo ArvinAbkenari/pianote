@@ -4,13 +4,21 @@ from bson import ObjectId
 
 User = get_user_model()
 
+
+
 class Note(models.Model):
+    LEVEL_CHOICES = [
+        (1, "مبتدی"),
+        (2, "متوسط"),
+        (3, "پیشرفته"),
+    ]
     id = models.CharField(max_length=24, primary_key=True, editable=False)
     name = models.CharField(max_length=150)
     genre = models.JSONField()
+    composer = models.CharField(max_length=150)
     description = models.TextField(blank= True, null=True)
-    level = models.IntegerField()
-    rate = models.IntegerField()
+    level = models.CharField(max_length=1, choices=LEVEL_CHOICES)
+    rate = models.FloatField()
     createdAt = models.DateTimeField()
     deleteFlag = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -29,6 +37,9 @@ class Note(models.Model):
 
     def __str__(self):
         return self.name
+    @property
+    def level_value(self):
+        return dict(self.LEVEL_CHOICES).get(self.level, "Unknown")
 
 @property
 def is_authenticated(self):
