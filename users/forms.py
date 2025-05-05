@@ -80,6 +80,7 @@ class UserSignupForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.id = str(ObjectId())
+        user.password = make_password(self.cleaned_data['password'])
         user.createdDate = timezone.now()
         user.premiumDate = timezone.now()
         user.isSuperUser = False

@@ -1,0 +1,199 @@
+:root {
+    --sidebar-bg: var(--bg-secondary);
+    --filter-hover: var(--accent-color);
+    --sheet-card-bg: var(--card-bg);
+    --sheet-card-shadow: var(--card-shadow);
+    --sheet-card-hover-shadow: var(--card-hover-shadow);
+}
+
+.sheets-container {
+    padding: 2rem 0;
+    min-height: calc(100vh - 300px);
+}
+
+
+.search-bar {
+    background: var(--sheet-card-bg);
+    color: var(--text-primary);
+}
+.search-bar:focus {
+    background: var(--sheet-card-bg);
+    color: var(--text-primary);
+}
+.search-bar::placeholder {
+    color: var(--text-secondary);
+}
+.input-with-icon {
+    position: relative;
+    display: block;
+}
+
+.input-with-icon .search-bar {
+    padding-left: 2.5rem; /* Add padding to make space for the icon */
+}
+
+.input-with-icon .icon {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem; /* Adjust based on your design */
+    transform: translateY(-50%);
+    color: var(--text-secondary); /* Match your theme */
+    pointer-events: none; /* Prevent interaction with the icon */
+}
+/* Pagination Styles */
+.pagination {
+    gap: 0.5rem;
+}
+
+.page-link {
+    border: none;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-primary);
+    background: var(--sheet-card-bg);
+    box-shadow: var(--sheet-card-shadow);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    transform: translateY(-2px);
+    background: var(--sheet-card-bg);
+    color: var(--accent-color);
+    box-shadow: var(--sheet-card-hover-shadow);
+}
+
+.page-item.active .page-link {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.page-item.disabled .page-link {
+    background: var(--sheet-card-bg);
+    opacity: 0.5;
+    color: var(--text-secondary);
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background: var(--sidebar-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    position: sticky;
+    top: 100px;
+    transition: background-color var(--transition-time) ease;
+}
+
+.sidebar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.filter-section {
+    margin-bottom: 2rem;
+}
+
+.filter-section h4 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.filter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filter-list li {
+    margin-bottom: 0.5rem;
+}
+
+.filter-list a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: block;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all var(--transition-time) ease;
+}
+
+.filter-list a:hover,
+.filter-list a.active {
+    color: var(--filter-hover);
+    background: rgba(49, 130, 206, 0.1);
+}
+
+/* Sheet Music Grid */
+.sheets-grid {
+    padding: 1rem 0;
+}
+
+.sheet-card {
+    background: var(--sheet-card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--sheet-card-shadow);
+    transition: all var(--transition-time) ease;
+    cursor: pointer;
+}
+
+.sheet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sheet-card-hover-shadow);
+}
+
+.sheet-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.sheet-info {
+    padding: 1.25rem;
+}
+
+.sheet-info h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.composer {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.sheet-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+}
+
+.difficulty,
+.genre {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: relative;
+        top: 0;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .sheet-card {
+        margin-bottom: 1.5rem;
+    }
+}

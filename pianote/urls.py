@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users import views
+from notes import views as notes_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,4 +27,5 @@ urlpatterns = [
     path("signin/", views.signin_view, name="signin"),
     path('logout/', views.logout_view, name='logout'),
     path('about-us/', views.aboutus_view, name='aboutus'),
+    path('notes/', notes_view.notes_view, name='notes'),
 ]

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}تماس با ما - پیانوت{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'notes/sheets.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+    <!-- Main Content -->
+    <div class="sheets-container">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-3">
+                    <div class="sidebar">
+                        <h3 class="sidebar-title">فیلتر ها</h3>
+                        
+                        <div class="filter-section">
+                            <h4>سبک موسیقی</h4>
+                            <ul class="filter-list">
+                                <li><a href="#" class="active">همه</a></li>
+                                <li><a href="#">کلاسیک</a></li>
+                                <li><a href="#">جاز</a></li>
+                                <li><a href="#">پاپ</a></li>
+                                <li><a href="#">سنتی</a></li>
+                            </ul>
+                        </div>
+                        <div class="filter-section">
+                            <h4>سطح دشواری</h4>
+                            <ul class="filter-list">
+                                <li><a href="#">مبتدی</a></li>
+                                <li><a href="#">متوسط</a></li>
+                                <li><a href="#">پیشرفته</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sheet Music Grid -->
+                <div class="col-lg-9">
+                    <div class="input-with-icon mb-4">
+                        <input type="text" class="form-control search-bar" placeholder="جستجو در نت‌ها...">
+                        <i class="icon bi bi-search"></i>
+                    </div>
+                    <div class="sheets-grid">
+                        <div class="row g-4">
+                            <!-- Sheet Music Items -->
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>سونات مهتاب</h3>
+                                        <p class="composer">بتهوون</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">پیشرفته</span>
+                                            <span class="genre">کلاسیک</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>برای الیز</h3>
+                                        <p class="composer">بتهوون</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">مبتدی</span>
+                                            <span class="genre">کلاسیک</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>والس بهاری</h3>
+                                        <p class="composer">شوپن</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">متوسط</span>
+                                            <span class="genre">کلاسیک</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>رویای عاشقانه</h3>
+                                        <p class="composer">لیست</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">پیشرفته</span>
+                                            <span class="genre">رمانتیک</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>نور ماه</h3>
+                                        <p class="composer">دبوسی</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">متوسط</span>
+                                            <span class="genre">امپرسیونیسم</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="sheet-card">
+                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <div class="sheet-info">
+                                        <h3>رقص ایرانی</h3>
+                                        <p class="composer">حسین دهلوی</p>
+                                        <div class="sheet-meta">
+                                            <span class="difficulty">متوسط</span>
+                                            <span class="genre">سنتی</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Pagination -->
+                        <nav class="mt-5" aria-label="صفحه بندی">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">قبلی</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">۱</a></li>
+                                <li class="page-item"><a class="page-link" href="#">۲</a></li>
+                                <li class="page-item"><a class="page-link" href="#">۳</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">بعدی</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    <!-- Footer -->
+
