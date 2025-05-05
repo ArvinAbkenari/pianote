@@ -1,0 +1,27 @@
+.map-wrapper {
+    height: var(--map-height);
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--contact-card-shadow);
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+}
+
+.leaflet-container {
+    border-radius: 12px;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    background-color: var(--contact-card-bg);
+    color: var(--text-primary);
+}
+
+.leaflet-popup-tip {
+    background-color: var(--contact-card-bg);
+}

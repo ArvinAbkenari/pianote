@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}تماس با ما - پیانوت{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'about-us/contact.css' %}">
+    <link rel="stylesheet" href="{% static 'about-us/map.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<main class="contact-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="contact-form-wrapper">
+                    <h2 class="section-title mb-4">تماس با ما</h2>
+                    <form id="contactForm" class="contact-form">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">نام و نام خانوادگی</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">ایمیل</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">موضوع</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">پیام</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">ارسال پیام</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="contact-info-wrapper">
+                    <div class="contact-info-card mb-4">
+                        <h3>اطلاعات تماس</h3>
+                        <ul class="contact-info-list">
+                            <li>
+                                <i class="bi bi-geo-alt"></i>
+                                <span>تهران، خیابان ولیعصر، پلاک ۱۲۳</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-telephone"></i>
+                                <span>۰۲۱-۱۲۳۴۵۶۷</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-envelope"></i>
+                                <span>info@pianote.com</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="map-wrapper">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static "about-us/contact.js"%}"></script>
+{% endblock %}

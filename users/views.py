@@ -5,6 +5,7 @@ from users.models import User
 from .forms import UserSignupForm
 from .forms import UserSigninForm
 
+
 def homePage(request):
     signup_form = UserSignupForm()
     return render(request, "users/index.html", {"form": signup_form})
@@ -48,3 +49,8 @@ def signin_view(request):
 def logout_view(request):
     request.session.flush()
     return HttpResponseRedirect(reverse('HomePage'))
+
+
+def aboutus_view(request):
+    signup_form = UserSignupForm()
+    return render(request, "about-us/contact.html",{"form": signup_form})
