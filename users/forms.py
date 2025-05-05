@@ -4,6 +4,8 @@ from bson import ObjectId
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 import re
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 
 class UserSignupForm(forms.ModelForm):
     rePassword = forms.CharField(
@@ -90,3 +92,19 @@ class UserSignupForm(forms.ModelForm):
 class UserSigninForm(forms.Form):
     email = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError("کاربری با این ایمیل یافت نشد.")
+
+        if not check_password(password, user.password):
+            raise ValidationError("رمز عبور اشتباه است.")
+
+        self.user = user
+
+        return cleaned_data

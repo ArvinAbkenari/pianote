@@ -31,15 +31,10 @@ def signin_view(request):
     if request.method == 'POST':
         form = UserSigninForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            try:
-                user = User.objects.get(email=email, password=password)
-                request.session['user_id'] = user.id 
-                request.session['fullName'] = user.fullName.split()[0]
-                return JsonResponse({'success': True, 'reload': True}) 
-            except User.DoesNotExist:
-                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+            user = form.user
+            request.session['user_id'] = user.id 
+            request.session['fullName'] = user.fullName.split()[0]
+            return JsonResponse({'success': True, 'reload': True}) 
         else:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
