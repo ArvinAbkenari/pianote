@@ -1,6 +1,9 @@
 .sheet-hero {
     margin-bottom: 2rem;
 }
+.bi-star-half{
+    transform: scaleX(-1);
+}
 
 .sheet-title {
     font-size: 2.5rem;

@@ -1,8 +1,9 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from users.forms import UserSignupForm, UserSigninForm
+from users.forms import UserSignupForm
 from .models import Note
-import datetime
+from django.utils import timezone
+from PyPDF2 import PdfReader
 
 
 # Create your views here.
@@ -35,12 +36,21 @@ def note_detail_view(request, note_id):
     except Note.DoesNotExist:
         return render(request, "404.html", status=404)
 
+    # Extract PDF page count
+    pdf_page_count = None
+    if note.notesheet and note.notesheet.path:
+        try:
+            reader = PdfReader(note.notesheet.path)
+            pdf_page_count = len(reader.pages)
+        except Exception:
+            pdf_page_count = None
+
     # Handle comment submission
     if request.method == "POST" and request.session.get("user_id"):
         comment_text = request.POST.get("comment_text", "").strip()
         if comment_text:
             user_id = request.session["user_id"]
-            note.add_comment(user_id, comment_text, datetime.datetime.now())
+            note.add_comment(user_id, comment_text, timezone.now())
         # After posting, redirect to avoid resubmission
         return redirect(request.path)
 
@@ -56,4 +66,4 @@ def note_detail_view(request, note_id):
             comment["fullName"] = "کاربر حذف شده"
         comments.append(comment)
 
-    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form, "comments": comments})
+    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form, "comments": comments, "pdf_page_count": pdf_page_count})

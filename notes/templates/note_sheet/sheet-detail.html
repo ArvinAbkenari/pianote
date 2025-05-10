@@ -46,7 +46,7 @@
           <h2>پیش نمایش صوتی</h2>
           <div class="player-wrapper p-3 rounded">
             <audio controls class="w-100">
-              <source src="#" type="audio/mpeg" />
+              <source src="{% static "images/sample.mp3" %}" type="audio/mp3" />
               مرورگر شما از پخش صوتی پشتیبانی نمی‌کند.
             </audio>
           </div>
@@ -60,7 +60,7 @@
             <div class="comment p-3 mb-3 rounded">
               <div class="d-flex justify-content-between">
                 <h5 class="comment-author">{{ comment.fullName }}</h5>
-                <small>{{ comment.createdAt|date:'Y-m-d H:i' }}</small>
+                <small>{{ comment.createdAt|persian_timesince }}</small>
               </div>
               <p class="mb-0">
                 {{ comment.text }}
@@ -107,13 +107,13 @@
               </p>
               <p class="mb-2">
                 <i class="bi bi-file-text"></i>
-                تعداد صفحات: ۱۵
+                تعداد صفحات: {% if pdf_page_count %}{{ pdf_page_count|to_persian_digits }}{% else %}نامشخص{% endif %}
               </p>
             </div>
-            <button class="btn btn-primary w-100">
+            <a href="{% static 'images/sheet.pdf' %}" class="btn btn-primary w-100" download>
               <i class="bi bi-download me-2"></i>
-              دانلود نت
-            </button>
+              دانلود نُت
+            </a>
           </div>
         </div>
       </div>
