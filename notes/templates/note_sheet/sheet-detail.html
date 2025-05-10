@@ -56,33 +56,35 @@
         <section class="comments-section">
           <h2>نظرات کاربران</h2>
           <div class="comments-list">
+            {% for comment in comments %}
             <div class="comment p-3 mb-3 rounded">
               <div class="d-flex justify-content-between">
-                <h5 class="comment-author">علی رضایی</h5>
-                <small>۲ روز پیش</small>
+                <h5 class="comment-author">{{ comment.fullName }}</h5>
+                <small>{{ comment.createdAt|date:'Y-m-d H:i' }}</small>
               </div>
               <p class="mb-0">
-                قطعه بسیار زیبایی است. موومان اول آن خیلی تاثیرگذار است.
+                {{ comment.text }}
               </p>
             </div>
-            <div class="comment p-3 mb-3 rounded">
-                <div class="d-flex justify-content-between">
-                  <h5 class="comment-author">علی رضایی</h5>
-                  <small>۲ روز پیش</small>
-                </div>
-                <p class="mb-0">
-                  قطعه بسیار زیبایی است. موومان اول آن خیلی تاثیرگذار است.
-                </p>
-              </div>
+            {% empty %}
+            <p>هنوز نظری ثبت نشده است.</p>
+            {% endfor %}
           </div>
-          <div class="comment-form mb-4">
+          {% if request.session.user_id %}
+          <form method="post" class="comment-form mb-4">
+            {% csrf_token %}
             <textarea
               class="form-control mb-3"
               rows="3"
+              name="comment_text"
               placeholder="نظر خود را بنویسید..."
+              required
             ></textarea>
-            <button class="btn btn-primary">ارسال نظر</button>
-          </div>
+            <button type="submit" class="btn btn-primary">ارسال نظر</button>
+          </form>
+          {% else %}
+          <div class="alert alert-warning mt-3">برای ثبت نظر باید وارد شوید.</div>
+          {% endif %}
         </section>
       </div>
 

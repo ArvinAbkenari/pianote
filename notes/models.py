@@ -34,7 +34,10 @@ class Note(models.Model):
     notesheet = models.FileField(upload_to='notesheets/', null=True, blank=True)
     audio = models.FileField(upload_to='audio/', null=True, blank=True)
     preview = models.ImageField(blank=True, null=True, upload_to='notesheets/previews/')
-    def add_comment(self, user_id, text, createdDate , delete_flag=False):
+    def add_comment(self, user_id, text, createdDate, delete_flag=False):
+        # Convert datetime to ISO string for JSON serialization
+        if hasattr(createdDate, 'isoformat'):
+            createdDate = createdDate.isoformat()
         comment = {
             "userID": user_id,
             "text": text,
@@ -54,14 +57,32 @@ class Note(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs) 
+        # Check if notesheet is being added or changed
+        is_new = self._state.adding or not self.pk
+        old_notesheet = None
+        if not is_new and self.pk:
+            try:
+                old = Note.objects.get(pk=self.pk)
+                old_notesheet = old.notesheet
+            except Note.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
 
-        if self.notesheet:
+        # Only generate preview if notesheet is present and changed
+        if self.notesheet and (is_new or self.notesheet != old_notesheet):
             pdf_path = self.notesheet.path
-            preview_path = os.path.join('media/notesheets/previews', f'{self.pk}_preview.png')
-            generate_pdf_preview(pdf_path, preview_path)
-            self.preview.name = preview_path.replace('media/', '')
-            super().save(update_fields=['preview'])  
+            # Ensure preview directory exists
+            preview_dir = os.path.join('media', 'notesheets', 'previews')
+            os.makedirs(preview_dir, exist_ok=True)
+            preview_filename = f'{self.pk}_preview.png'
+            preview_path = os.path.join(preview_dir, preview_filename)
+            try:
+                Note.generate_pdf_preview(pdf_path, preview_path)
+                self.preview.name = os.path.join('notesheets', 'previews', preview_filename)
+                super().save(update_fields=['preview'])
+            except Exception as e:
+                # Optionally log the error
+                pass
         
     
     @property

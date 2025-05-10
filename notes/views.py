@@ -1,7 +1,8 @@
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from users.forms import UserSignupForm, UserSigninForm
 from .models import Note
+import datetime
 
 
 # Create your views here.
@@ -34,4 +35,25 @@ def note_detail_view(request, note_id):
     except Note.DoesNotExist:
         return render(request, "404.html", status=404)
 
-    return render(request, "note_sheet/sheet-detail.html", {"note": note,"form": signup_form})
+    # Handle comment submission
+    if request.method == "POST" and request.session.get("user_id"):
+        comment_text = request.POST.get("comment_text", "").strip()
+        if comment_text:
+            user_id = request.session["user_id"]
+            note.add_comment(user_id, comment_text, datetime.datetime.now())
+        # After posting, redirect to avoid resubmission
+        return redirect(request.path)
+
+    # Attach user fullName to each comment
+    from users.models import User
+    comments = []
+    for comment in note.comments:
+        user_id = comment.get("userID")
+        try:
+            user = User.objects.get(id=user_id)
+            comment["fullName"] = user.fullName
+        except User.DoesNotExist:
+            comment["fullName"] = "کاربر حذف شده"
+        comments.append(comment)
+
+    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form, "comments": comments})
