@@ -22,7 +22,7 @@ class Note(models.Model):
     genre = models.JSONField()
     composer = models.CharField(max_length=150)
     description = models.TextField(blank= True, null=True)
-    level = models.CharField(max_length=1, choices=LEVEL_CHOICES)
+    level = models.IntegerField(choices=LEVEL_CHOICES)
     rate = models.FloatField()
     likes = models.IntegerField()
     views = models.IntegerField()

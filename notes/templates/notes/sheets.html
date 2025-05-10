@@ -16,27 +16,31 @@
                     <div class="sidebar">
                         <h3 class="sidebar-title">فیلتر ها</h3>
                         
-                        <div class="filter-section">
-                            <h4>سبک موسیقی</h4>
-                            <ul class="filter-list">
-                                <li><a href="#" class="active">همه</a></li>
-                                <li><a href="#">کلاسیک</a></li>
-                                <li><a href="#">جاز</a></li>
-                                <li><a href="#">پاپ</a></li>
-                                <li><a href="#">سنتی</a></li>
-                            </ul>
-                        </div>
-                        <div class="filter-section">
-                            <h4>سطح دشواری</h4>
-                            <ul class="filter-list">
-                                <li><a href="#">مبتدی</a></li>
-                                <li><a href="#">متوسط</a></li>
-                                <li><a href="#">پیشرفته</a></li>
-                            </ul>
-                        </div>
+                        <form action="/notes/" method="get" id="filterForm">
+                            <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+                            <button type="submit" id="filterButton" class="btn btn-primary">اعمال فیلتر</button>
+                            <button type="button" class="btn btn-outline-danger" onclick="resetFilters()">حذف فیلتر</button>
+                            </div>
+                            <div class="filter-section">
+                                <h4>سبک موسیقی</h4>
+                                <ul class="filter-list">
+                                    <li><label><input type="checkbox" name="genre" value="Classical" {% if 'Classical' in selected_genres %}checked{% endif %}> کلاسیک</label></li>
+                                    <li><label><input type="checkbox" name="genre" value="Jazz" {% if 'Jazz' in selected_genres %}checked{% endif %}> جاز</label></li>
+                                    <li><label><input type="checkbox" name="genre" value="pop" {% if 'pop' in selected_genres %}checked{% endif %}> پاپ</label></li>
+                                    <li><label><input type="checkbox" name="genre" value="traditional" {% if 'traditional' in selected_genres %}checked{% endif %}> سنتی</label></li>
+                                </ul>
+                            </div>
+                            <div class="filter-section">
+                                <h4>سطح دشواری</h4>
+                                <ul class="filter-list">
+                                    <li><label><input type="checkbox" name="level" value="1" {% if '1' in selected_levels %}checked{% endif %}> مبتدی</label></li>
+                                    <li><label><input type="checkbox" name="level" value="2" {% if '2' in selected_levels %}checked{% endif %}> متوسط</label></li>
+                                    <li><label><input type="checkbox" name="level" value="3" {% if '3' in selected_levels %}checked{% endif %}> پیشرفته</label></li>
+                                </ul>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
                 <!-- Sheet Music Grid -->
                 <div class="col-lg-9">
                     <div class="input-with-icon mb-4">
@@ -77,9 +81,9 @@
                                                 </div>
                                             </div>
                                             <div class="sheet-meta">
-                                                <span class="difficulty">{{ note.level_value }}</span>
+                                                <a href="/notes/?level={{ note.level }}" class="difficulty">{{ note.level_value }}</a>
                                                 {%for genre in note.genre%}
-                                                    <span class="genre">{{genre}}</span>
+                                                    <span class="genre" onclick="searchByGenre('{{ genre }}')">{{genre}}</span>
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -91,15 +95,37 @@
                         <!-- Pagination -->
                         <nav class="mt-5" aria-label="صفحه بندی">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">قبلی</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">۱</a></li>
-                                <li class="page-item"><a class="page-link" href="#">۲</a></li>
-                                <li class="page-item"><a class="page-link" href="#">۳</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">بعدی</a>
-                                </li>
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">قبلی</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">قبلی</a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active" aria-current="page">
+                                            <a class="page-link" href="#">{{ num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" aria-disabled="true">بعدی</a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </nav>
                     </div>
@@ -140,6 +166,20 @@
         function debounceSearch() {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(searchArticles, 300);
+        }
+
+        function searchByDifficulty(level) {
+            const query = `level=${encodeURIComponent(level)}`;
+            window.location.href = `/notes/?${query}`;
+        }
+
+        function searchByGenre(genre) {
+            const query = `genre=${encodeURIComponent(genre)}`;
+            window.location.href = `/notes/?${query}`;
+        }
+
+        function resetFilters() {
+            window.location.href = '/notes/';
         }
     </script>
     {% endblock %}
