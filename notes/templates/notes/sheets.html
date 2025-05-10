@@ -5,9 +5,7 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'notes/sheets.css' %}">
 {% endblock %}
-
-
-
+{% load humanize %}
 {% block content %}
     <!-- Main Content -->
     <div class="sheets-container">
@@ -44,7 +42,9 @@
                     <div class="input-with-icon mb-4">
                         <input type="text" id="searchInput" class="form-control search-bar" placeholder="جستجو در نت‌ها..." onkeyup="debounceSearch()">
                         <i class="icon bi bi-search"></i>
-                        <div id="results" class="search-results mt-3"></div>
+                        <div id="results" class="search-results mt-3">
+
+                        </div>
                     </div>
                     <div class="sheets-grid">
                         <div class="row g-4">
@@ -52,20 +52,27 @@
                             {% for note in notes %}
                             <div class="col-md-6 col-lg-4">
                                 <div class="sheet-card">
-                                    <img src="../assets/notes.jpg" alt="نت موسیقی" class="sheet-preview">
+                                    <img src="{{ note.notesheet.url }}" alt="نت موسیقی" class="sheet-preview">
                                     <div class="sheet-info">
                                         <h3>{{ note.name }}</h3>
                                         <p class="composer">{{note.composer}}</p>
-                                        <div class="sheet-rating mb-2">
-                                            {% for i in "12345" %}
-                                                {% with note.rate|star_class:forloop.counter as star_class %}
-                                                    <i class="icon bi {{ star_class }}"
-                                                       {% if star_class == "bi-star-half" %}
-                                                           style="transform: scaleX(-1); display: inline-block;"
-                                                       {% endif %}>
-                                                    </i>
-                                                {% endwith %}
-                                            {% endfor %}
+                                        <div class="d-flex ">
+                                            <div class="sheet-rating mb-2">
+                                                {% for i in "12345" %}
+                                                    {% with note.rate|star_class:forloop.counter as star_class %}
+                                                        <i class="icon bi {{ star_class }}"
+                                                           {% if star_class == "bi-star-half" %}
+                                                               style="transform: scaleX(-1); display: inline-block;"
+                                                           {% endif %}>
+                                                        </i>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </div>
+                                            <p class="mx-2 opacity-50">|</p>
+                                            <div class="view_count">
+                                                <span class="views">{{ note.views|intcomma|to_persian_digits }}</span>
+                                                <i class="bi bi-eye-fill"></i>
+                                            </div>
                                         </div>
                                         <div class="sheet-meta">
                                             <span class="difficulty">{{ note.level_value }}</span>
@@ -131,7 +138,6 @@
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(searchArticles, 300);
         }
-        </script>
+    </script>
     {% endblock %}
     <!-- Footer -->
-

@@ -182,6 +182,10 @@
     background: var(--bg-secondary);
     color: var(--text-secondary);
 }
+.view_count{
+    color: var(--text-secondary);
+    font-size: 14px;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 991.98px) {

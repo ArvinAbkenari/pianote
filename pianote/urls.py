@@ -19,6 +19,9 @@ from django.contrib import admin
 from django.urls import path
 from users import views
 from notes import views as notes_view
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,3 +33,5 @@ urlpatterns = [
     path('notes/', notes_view.notes_view, name='notes'),
     path("ajax/search/", notes_view.ajax_search, name="ajax_search"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
