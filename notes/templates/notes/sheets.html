@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}تماس با ما - پیانوت{% endblock %}
+{% block title %}نت کده - پیانوت{% endblock %}
 {% load star_tags %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'notes/sheets.css' %}">
@@ -51,37 +51,40 @@
                             <!-- Sheet Music Items -->
                             {% for note in notes %}
                             <div class="col-md-6 col-lg-4">
-                                <div class="sheet-card">
-                                    <img src="{{ note.notesheet.url }}" alt="نت موسیقی" class="sheet-preview">
-                                    <div class="sheet-info">
-                                        <h3>{{ note.name }}</h3>
-                                        <p class="composer">{{note.composer}}</p>
-                                        <div class="d-flex ">
-                                            <div class="sheet-rating mb-2">
-                                                {% for i in "12345" %}
-                                                    {% with note.rate|star_class:forloop.counter as star_class %}
-                                                        <i class="icon bi {{ star_class }}"
-                                                           {% if star_class == "bi-star-half" %}
-                                                               style="transform: scaleX(-1); display: inline-block;"
-                                                           {% endif %}>
-                                                        </i>
-                                                    {% endwith %}
+                                <a href="{% url 'note-detail' note.id %}">
+
+                                    <div class="sheet-card">
+                                        <img src="{{ note.notesheet.url }}" alt="نت موسیقی" class="sheet-preview">
+                                        <div class="sheet-info">
+                                            <h3>{{ note.name }}</h3>
+                                            <p class="composer">{{note.composer}}</p>
+                                            <div class="d-flex ">
+                                                <div class="sheet-rating mb-2">
+                                                    {% for i in "12345" %}
+                                                        {% with note.rate|star_class:forloop.counter as star_class %}
+                                                            <i class="icon bi {{ star_class }}"
+                                                               {% if star_class == "bi-star-half" %}
+                                                                   style="transform: scaleX(-1); display: inline-block;"
+                                                               {% endif %}>
+                                                            </i>
+                                                        {% endwith %}
+                                                    {% endfor %}
+                                                </div>
+                                                <p class="mx-2 opacity-50">|</p>
+                                                <div class="view_count">
+                                                    <span class="views">{{ note.views|intcomma|to_persian_digits }}</span>
+                                                    <i class="bi bi-eye-fill"></i>
+                                                </div>
+                                            </div>
+                                            <div class="sheet-meta">
+                                                <span class="difficulty">{{ note.level_value }}</span>
+                                                {%for genre in note.genre%}
+                                                    <span class="genre">{{genre}}</span>
                                                 {% endfor %}
                                             </div>
-                                            <p class="mx-2 opacity-50">|</p>
-                                            <div class="view_count">
-                                                <span class="views">{{ note.views|intcomma|to_persian_digits }}</span>
-                                                <i class="bi bi-eye-fill"></i>
-                                            </div>
-                                        </div>
-                                        <div class="sheet-meta">
-                                            <span class="difficulty">{{ note.level_value }}</span>
-                                            {%for genre in note.genre%}
-                                                <span class="genre">{{genre}}</span>
-                                            {% endfor %}
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                              {% endfor %}
                         </div>
@@ -115,7 +118,7 @@
         
             fetch(`/ajax/search/?q=${encodeURIComponent(query)}`)
                 .then(response => response.json())
-                .then(data => {
+                .then (data => {
                     const resultsDiv = document.getElementById("results");
                     resultsDiv.innerHTML = "";
         

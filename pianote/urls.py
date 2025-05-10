@@ -32,6 +32,7 @@ urlpatterns = [
     path('about-us/', views.aboutus_view, name='aboutus'),
     path('notes/', notes_view.notes_view, name='notes'),
     path("ajax/search/", notes_view.ajax_search, name="ajax_search"),
+    path('notes/<str:note_id>/', notes_view.note_detail_view, name='note-detail'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

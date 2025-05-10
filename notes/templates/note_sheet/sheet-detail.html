@@ -1,0 +1,132 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %} {% load star_tags %} {% block title %}تماس با ما -
+پیانوت{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'note_sheet/sheet-detail.css' %}" />
+{% endblock %} {% block content %}
+
+<!-- Main Content -->
+<div class="sheet-detail-container">
+  <div class="container">
+    <div class="row my-3 g-5">
+      <div class="col-lg-6">
+        <!-- Hero Section -->
+        <section class="sheet-hero pt-4 pb-1">
+          <h1 class="sheet-title">{{ note.name }}</h1>
+          <div class="composer mb-3">
+            <span>آهنگساز:</span>
+            <span class="composer-name">{{ note.composer }}</span>
+          </div>
+          <div class="metadata d-flex flex-wrap gap-3 mb-4">
+            <span class="badge bg-primary">{{ note.genre|join:", " }}</span>
+            <span class="badge bg-info">{{ note.level_value }}</span>
+            <div class="views">
+              <i class="bi bi-eye"></i>
+              <span>{{ note.views|intcomma|to_persian_digits }} بازدید</span>
+            </div>
+            <div class="rating">
+              {% for i in "12345" %}
+                {% with note.rate|star_class:forloop.counter as star_class %}
+                  <i class="bi {{ star_class }} text-warning"></i>
+                {% endwith %}
+              {% endfor %}
+              <span>({{ note.rate }})</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Description Section -->
+        <section class="sheet-description mb-5">
+          <h2>درباره این قطعه</h2>
+          <p>
+            {{ note.description }}
+          </p>
+        </section>
+
+        <!-- Audio Player Section -->
+        <section class="audio-player mb-5">
+          <h2>پیش نمایش صوتی</h2>
+          <div class="player-wrapper p-3 rounded">
+            <audio controls class="w-100">
+              <source src="#" type="audio/mpeg" />
+              مرورگر شما از پخش صوتی پشتیبانی نمی‌کند.
+            </audio>
+          </div>
+        </section>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+          <h2>نظرات کاربران</h2>
+          <div class="comments-list">
+            <div class="comment p-3 mb-3 rounded">
+              <div class="d-flex justify-content-between">
+                <h5 class="comment-author">علی رضایی</h5>
+                <small>۲ روز پیش</small>
+              </div>
+              <p class="mb-0">
+                قطعه بسیار زیبایی است. موومان اول آن خیلی تاثیرگذار است.
+              </p>
+            </div>
+            <div class="comment p-3 mb-3 rounded">
+                <div class="d-flex justify-content-between">
+                  <h5 class="comment-author">علی رضایی</h5>
+                  <small>۲ روز پیش</small>
+                </div>
+                <p class="mb-0">
+                  قطعه بسیار زیبایی است. موومان اول آن خیلی تاثیرگذار است.
+                </p>
+              </div>
+          </div>
+          <div class="comment-form mb-4">
+            <textarea
+              class="form-control mb-3"
+              rows="3"
+              placeholder="نظر خود را بنویسید..."
+            ></textarea>
+            <button class="btn btn-primary">ارسال نظر</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="position-sticky" style="top: 2rem">
+          <!-- Sheet Image -->
+          <div class="mb-4">
+            <!-- <img src="../assets/notes.jpg" alt="سونات مهتاب" class="img-fluid rounded shadow"> -->
+            <!-- <embed class="pdf-viewer" src="../assets/sheet.pdf" width="100%" height="600px" type="application/pdf"> -->
+            <div id="pdf-viewer"></div>
+          </div>
+
+          <!-- Download Box -->
+          <div class="download-box p-4 rounded mb-4">
+            <h3>دانلود نت</h3>
+            <div class="file-info mb-3">
+              <p class="mb-2">
+                <i class="bi bi-file-earmark-pdf"></i>
+                فرمت: PDF
+              </p>
+              <p class="mb-2">
+                <i class="bi bi-file-text"></i>
+                تعداد صفحات: ۱۵
+              </p>
+            </div>
+            <button class="btn btn-primary w-100">
+              <i class="bi bi-download me-2"></i>
+              دانلود نت
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+ {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfobject/2.2.12/pdfobject.min.js"></script>
+<script>
+  PDFObject.embed("{% static "images/sheet.pdf" %}", "#pdf-viewer", {
+    width: "100%",
+    height: "800px",
+  });
+</script>
+
+{% endblock %}

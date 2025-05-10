@@ -23,3 +23,15 @@ def ajax_search(request):
         results = [{"name": note.name} for note in notes]
 
     return JsonResponse({"results": results})
+
+
+
+
+def note_detail_view(request, note_id):
+    signup_form = UserSignupForm()
+    try:
+        note = Note.objects.get(id=note_id, deleteFlag=False)
+    except Note.DoesNotExist:
+        return render(request, "404.html", status=404)
+
+    return render(request, "note_sheet/sheet-detail.html", {"note": note,"form": signup_form})
