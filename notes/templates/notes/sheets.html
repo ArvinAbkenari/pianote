@@ -43,12 +43,13 @@
                 </div>
                 <!-- Sheet Music Grid -->
                 <div class="col-lg-9">
-                    <div class="input-with-icon mb-4">
+                    <div class="input-with-icon">
                         <input type="text" id="searchInput" class="form-control search-bar" placeholder="جستجو در نت‌ها..." onkeyup="debounceSearch()">
                         <i class="icon bi bi-search"></i>
-                        <div id="results" class="search-results mt-3">
 
-                        </div>
+                    </div>
+                    <div id="results" class="search-results mt-2 mb-4">
+
                     </div>
                     <div class="sheets-grid">
                         <div class="row g-4">
@@ -154,8 +155,19 @@
                     }
         
                     data.results.forEach(item => {
+                        // Modern card style for each result
                         const div = document.createElement("div");
-                        div.innerHTML = `<strong>${item.name}</strong><br>`;
+                        div.className = "search-result-card";
+                        div.innerHTML = `
+                            <a href="/notes/${item.id}/" class="result-link">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <strong class="result-title">${item.name}</strong><br>
+                                        <span class="result-composer">${item.composer ? item.composer : ''}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
                         resultsDiv.appendChild(div);
                     });
                 });

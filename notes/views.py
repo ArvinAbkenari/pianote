@@ -25,7 +25,7 @@ def ajax_search(request):
         notes = Note.objects.filter(
             Q(name__icontains=query)
         )
-        results = [{"name": note.name} for note in notes]
+        results = [{"name": note.name, "composer":note.composer, "id":note.id} for note in notes]
 
     return JsonResponse({"results": results})
 
