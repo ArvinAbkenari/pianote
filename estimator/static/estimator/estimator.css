@@ -1,0 +1,84 @@
+
+.card {
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 24px 0 rgba(44,62,80,0.07), 0 1.5px 4px 0 rgba(44,62,80,0.03);
+    border: none;
+    background: var(--card-bg, #fff);
+}
+.form-title{
+    color: var(--text-primary);
+}
+
+#piano-form label {
+    font-weight: 600;
+    color: var(--accent-color, #3a3a7c);
+    letter-spacing: 0.01em;
+}
+#piano-form .form-control, #piano-form .form-select {
+    border-radius: 0.75rem;
+    min-height: 48px;
+    border: 1.5px solid #e0e6ed;
+    background: #fafdff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#piano-form .form-control:focus, #piano-form .form-select:focus {
+    border-color: var(--accent-color, #3a3a7c);
+    box-shadow: 0 0 0 0.15rem rgba(58,58,124,0.08);
+}
+#piano-form .btn-primary {
+    background: linear-gradient(90deg, var(--accent-color, #3a3a7c) 0%, var(--button-bg, #6e8efb) 100%);
+    border: none;
+    border-radius: 2rem;
+    font-size: 1.15rem;
+    padding: 0.85rem 2.7rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px 0 rgba(58,58,124,0.08);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+#piano-form .btn-primary:hover, #piano-form .btn-primary:focus {
+    background: linear-gradient(90deg, var(--button-bg, #6e8efb) 0%, var(--accent-color, #3a3a7c) 100%);
+    box-shadow: 0 4px 16px 0 rgba(58,58,124,0.13);
+    transform: translateY(-2px) scale(1.03);
+}
+#result {
+    background: linear-gradient(90deg, #e9f7ef 0%, #f3f6fb 100%);
+    border-radius: 1rem;
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 8px 0 rgba(44,62,80,0.06);
+}
+#estimated-price {
+    color: var(--accent-color, #3a3a7c);
+    text-shadow: 0 2px 8px rgba(58,58,124,0.07);
+}
+#charts-section {
+    background: var(--card-bg, #fff);
+    border-radius: 1.25rem;
+    margin-top: 2.5rem;
+    box-shadow: 0 4px 24px 0 rgba(44,62,80,0.07), 0 1.5px 4px 0 rgba(44,62,80,0.03);
+}
+#charts-section h3 {
+    color: var(--accent-color, #3a3a7c);
+    font-weight: 700;
+}
+#charts-section canvas {
+    background: #fafdff;
+    border-radius: 1rem;
+    box-shadow: 0 1px 4px 0 rgba(44,62,80,0.04);
+}
+@media (max-width: 991px) {
+    .card, #charts-section {
+        padding: 1.2rem;
+    }
+}
+@media (max-width: 575px) {
+    .card, #charts-section {
+        padding: 0.6rem;
+    }
+    #piano-form .btn-primary {
+        width: 100%;
+    }
+    #result {
+        padding: 1.2rem 0.5rem;
+    }
+}

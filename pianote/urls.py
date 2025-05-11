@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import path
 from users import views
 from notes import views as notes_view
+from estimator import views as estimator_view
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -33,6 +34,7 @@ urlpatterns = [
     path('notes/', notes_view.notes_list, name='note_list'),
     path("ajax/search/", notes_view.ajax_search, name="ajax_search"),
     path('notes/<str:note_id>/', notes_view.note_detail_view, name='note-detail'),
+    path("price-estimator/", estimator_view.estimator_view, name="estimator"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

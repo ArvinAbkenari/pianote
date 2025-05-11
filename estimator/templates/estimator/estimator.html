@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}تخمین قیمت پیانو - پیانوت{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'estimator/estimator.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h2 class="mb-4 form-title text-center">تخمین قیمت پیانو</h2>
+                        <form id="piano-form" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="brand" class="form-label">برند</label>
+                                <select id="brand" class="form-select" required>
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="Yamaha">Yamaha</option>
+                                    <option value="Steinway & Sons">Steinway & Sons</option>
+                                    <option value="Kawai">Kawai</option>
+                                    <option value="Fazioli">Fazioli</option>
+                                    <option value="Bechstein">Bechstein</option>
+                                    <option value="Other">سایر</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="model" class="form-label">مدل</label>
+                                <input type="text" id="model" class="form-control" placeholder="مدل پیانو" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="dimension" class="form-label">ابعاد (سانتی‌متر)</label>
+                                <input type="number" id="dimension" class="form-control" placeholder="مثلاً 150" min="50" max="300" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="material" class="form-label">جنس بدنه</label>
+                                <select id="material" class="form-select" required>
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="چوب افرا">چوب افرا</option>
+                                    <option value="چوب گردو">چوب گردو</option>
+                                    <option value="چوب راش">چوب راش</option>
+                                    <option value="فلز">فلز</option>
+                                    <option value="Other">سایر</option>
+                                </select>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary px-5">تخمین قیمت</button>
+                            </div>
+                        </form>
+                        <div id="result" class="mt-4 text-center" style="display:none;">
+                            <h4>قیمت تخمینی:</h4>
+                            <div id="estimated-price" class="fs-2 fw-bold text-success"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="charts-section" class="card shadow-sm p-4" style="display:none;">
+                    <h3 class="mb-4 text-center">آمار و نمودارها</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <canvas id="brandBarChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="materialPieChart"></canvas>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <canvas id="dimensionScatterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+
+    {% block extra_js %}
+    <script src="{% static "estimator/estimator.js"%}"></script>
+    {% endblock %}
