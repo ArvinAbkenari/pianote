@@ -1,0 +1,254 @@
+:root {
+    --card-padding: 1.5rem;
+    --border-radius: 12px;
+    --chart-height: 200px;
+    --grid-gap: 1.5rem;
+    --upload-box-height: 200px;
+}
+
+.dashboard-container {
+    max-width: 1200px ;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+    background: var(--bg-primary);
+    direction: rtl;
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.exercise_title{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--bg-secondary);
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+
+.dashboard-content h2 {
+    font-size: 1.35rem;
+    margin-bottom: 1.25rem;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-name {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Song Selection Section */
+.song-library {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--grid-gap);
+    margin-top: 1.5rem;
+}
+
+.song-card, .upload-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: var(--card-padding);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.song-card:hover, .upload-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.song-info h3 {
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.song-info p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.select-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+}
+
+.select-btn:hover {
+    background: var(--button-hover-bg);
+}
+
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.upload-card i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Practice Section */
+.practice-section{
+    margin-top: 20px;
+}
+.upload-container {
+    margin: 2rem 0;
+}
+
+.upload-box {
+    height: var(--upload-box-height);
+    border: 2px dashed var(--input-border);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    background: var(--bg-secondary);
+}
+
+.upload-box:hover {
+    border-color: var(--accent-color);
+    background: var(--bg-primary);
+}
+
+.upload-box i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-bottom: 0.75rem;
+}
+
+.upload-box p {
+    margin: 0.5rem 0;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.upload-box span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Visualization Section */
+.visualization-container {
+    margin: 2rem 0;
+}
+
+.waveform-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--grid-gap);
+}
+
+.waveform {
+    background: var(--card-bg);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.waveform h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.waveform-placeholder {
+    height: 100px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+}
+
+/* Performance Metrics */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--grid-gap);
+    margin-top: 1.5rem;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.metric-card h3 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.score-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chart-container {
+    height: var(--chart-height);
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .waveform-comparison {
+        grid-template-columns: 1fr;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}

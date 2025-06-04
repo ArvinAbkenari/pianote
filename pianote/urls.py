@@ -20,6 +20,7 @@ from django.urls import path
 from users import views
 from notes import views as notes_view
 from estimator import views as estimator_view
+from exercise import views as exercise_view
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -35,6 +36,7 @@ urlpatterns = [
     path("ajax/search/", notes_view.ajax_search, name="ajax_search"),
     path('notes/<str:note_id>/', notes_view.note_detail_view, name='note-detail'),
     path("price-estimator/", estimator_view.estimator_view, name="estimator"),
+    path("exercise/", exercise_view.exercise_view, name="exercise"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
