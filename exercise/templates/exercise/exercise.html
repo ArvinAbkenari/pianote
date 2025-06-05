@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}تمرین - پیانوت{% endblock %}
@@ -7,63 +6,70 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
-
 {% block content %}
-        <div class="dashboard-container dashboard-content ">
-            <h1 class=" exercise_title mb-4">داشبورد تمرین</h1>
-            <section class="song-selection-section">
-                <h2>قطعه خود را انتخاب کنید</h2>
-                <div class="song-library">
-                    <div class="song-card">
-                        <div class="song-info">
-                            <h3>سونات مهتاب</h3>
-                            <p>بتهوون</p>
-                        </div>
-                        <button class="select-btn">انتخاب</button>
+<div class="dashboard-container dashboard-content ">
+    <h1 class=" exercise_title mb-4">داشبورد تمرین</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <section class="song-selection-section">
+            <h2>قطعه خود را انتخاب کنید</h2>
+            <div class="song-library">
+                {% for ref in reference_files %}
+                <div class="song-card" data-ref="{{ ref }}">
+                    <div class="song-info">
+                        <h3>
+                          {% if ref|length > 15 %}
+                            {{ ref|slice:":15" }}...
+                          {% else %}
+                            {{ ref }}
+                          {% endif %}
+                        </h3>
+                        <p>فایل مرجع</p>
                     </div>
-                    <div class="song-card">
-                        <div class="song-info">
-                            <h3>برای الیز</h3>
-                            <p>بتهوون</p>
-                        </div>
-                        <button class="select-btn">انتخاب</button>
+                    <button type="button" class="select-btn">انتخاب</button>
+                </div>
+                {% endfor %}
+                <div class="upload-card" id="referenceUploadCard">
+                    <i class="bi bi-plus-circle-dotted"></i>
+                    <p>بارگذاری قطعه جدید</p>
+                    {{ audio_form.reference_audio }}
+                    <div class="uploaded-filename" id="referenceFileName"></div>
+                </div>
+            </div>
+            <input type="hidden" name="selected_reference" id="selectedReferenceInput">
+        </section>
+
+        <section class="practice-section">
+            <h2>تمرین شما</h2>
+            <div class="upload-container">
+                <div class="upload-box" id="practiceUpload">
+                    <i class="bi bi-mic-fill"></i>
+                    <p>بارگذاری ضبط تمرین شما</p>
+                    <span>یا فایل صوتی را بکشید و رها کنید</span>
+                    {{ audio_form.user_audio }}
+                    <div class="uploaded-filename" id="userFileName"></div>
+                </div>
+            </div>
+
+            <div class="visualization-container">
+                <div class="waveform-comparison">
+                    <div class="waveform original">
+                        <h4>اصلی</h4>
+                        <div class="waveform-placeholder"></div>
                     </div>
-                    <div class="upload-card">
-                        <i class="bi bi-plus-circle-dotted"></i>
-                        <p>بارگذاری قطعه جدید</p>
+                    <div class="waveform practice">
+                        <h4>تمرین شما</h4>
+                        <div class="waveform-placeholder"></div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="practice-section">
-                <h2>تمرین شما</h2>
-                <div class="upload-container">
-                    <div class="upload-box" id="practiceUpload">
-                        <i class="bi bi-mic-fill"></i>
-                        <p>بارگذاری ضبط تمرین شما</p>
-                        <span>یا فایل صوتی را بکشید و رها کنید</span>
-                        <input type="file" accept="audio/*" hidden>
-                    </div>
-                </div>
-
-                <div class="visualization-container">
-                    <div class="waveform-comparison">
-                        <div class="waveform original">
-                            <h4>اصلی</h4>
-                            <div class="waveform-placeholder"></div>
-                        </div>
-                        <div class="waveform practice">
-                            <h4>تمرین شما</h4>
-                            <div class="waveform-placeholder"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="performance-metrics">
-                <h2>تحلیل عملکرد</h2>
-                <div class="metrics-grid">
-                    <div class="metric-card">
+        <section class="performance-metrics">
+            <h2>تحلیل عملکرد</h2>
+            <div class="row g-4 metrics-grid">
+                <div class="col-3 col-md-3">
+                    <div class="metric-card h-100">
                         <h3>امتیاز دقت</h3>
                         <div class="score-circle">
                             <svg viewBox="0 0 36 36" class="circular-chart">
@@ -79,36 +85,47 @@
                                     fill="none"
                                     stroke="var(--accent-color)"
                                     stroke-width="3"
-                                    stroke-dasharray="75, 100"/>
+                                    stroke-dasharray="{{ result.overall_score|default:75 }}, 100"/>
                             </svg>
-                            <span class="percentage">75%</span>
+                            <span class="percentage">{{ result.overall_score|default:'75' }}%</span>
                         </div>
                     </div>
-                    <div class="metric-card">
+                </div>
+                <div class="col-9 col-md-9">
+                    <div class="metric-card h-100">
                         <h3>دقت زمان‌بندی</h3>
                         <div id="timingChart" class="chart-container">
                             <canvas id="timingCanvas"></canvas>
                         </div>
                     </div>
-                    <div class="metric-card">
+                </div>
+                <div class="col-12 col-md-12">
+                    <div class="metric-card h-100">
                         <h3>دقت نت‌ها</h3>
                         <div id="noteChart" class="chart-container">
                             <canvas id="noteCanvas"></canvas>
                         </div>
                     </div>
-                    <div class="metric-card">
-                        <h3>نمودار پیشرفت</h3>
-                        <div id="progressChart" class="chart-container">
-                            <canvas id="progressCanvas"></canvas>
-                        </div>
-                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
+        <div style="margin-top:2rem;">
+            {% if result %}
+                {% if result.error %}
+                    <div class="alert alert-danger">خطا: {{ result.error }}</div>
+                {% else %}
+                    <div class="alert alert-success">امتیاز کلی: {{ result.overall_score }}/100 | امتیاز نت: {{ result.pitch_score|floatformat:1 }}/100 | امتیاز زمان‌بندی: {{ result.timing_score|floatformat:1 }}/100</div>
+                {% endif %}
+            {% endif %}
         </div>
-
-
-        {% endblock %}
-        {% block extra_js %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static "exercise/exercise.js"%}"></script>
-    {% endblock %}
+        <button type="submit" class="btn btn-primary" style="margin-top:2rem;">تحلیل کن</button>
+    </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static "exercise/exercise.js"%}"></script>
+{% if result %}
+  {{ result|json_script:"chartjsResultData" }}
+{% endif %}
+{% endblock %}

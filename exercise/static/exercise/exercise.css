@@ -160,6 +160,25 @@
     font-size: 0.85rem;
 }
 
+.upload-box input[type="file"],
+.upload-card input[type="file"] {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    position: absolute;
+    z-index: -1;
+}
+.upload-box .uploaded-filename,
+.upload-card .uploaded-filename {
+    margin-top: 0.5rem;
+    color: var(--accent-color);
+    font-size: 0.95rem;
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+    text-align: center;
+    direction: ltr;
+    word-break: break-all;
+}
+
 /* Visualization Section */
 .visualization-container {
     margin: 2rem 0;
@@ -191,18 +210,14 @@
 }
 
 /* Performance Metrics */
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--grid-gap);
-    margin-top: 1.5rem;
-}
+
 
 .metric-card {
     background: var(--card-bg);
     padding: var(--card-padding);
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
+    margin-bottom: var(--grid-gap);
 }
 
 .metric-card h3 {
@@ -251,4 +266,31 @@
     .metrics-grid {
         grid-template-columns: 1fr;
     }
+}
+
+@media (max-width: 900px) {
+    .metrics-grid {
+        gap: var(--grid-gap);
+    }
+    .metric-card {
+        max-width: 100%;
+    }
+}
+
+.song-card.selected-song {
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+input[type="file"]::-webkit-file-upload-button,
+input[type="file"]::before,
+input[type="file"]::file-selector-button {
+    display: none !important;
+}
+input[type="file"] {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    position: absolute;
+    z-index: -1;
 }
