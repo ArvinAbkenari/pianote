@@ -203,11 +203,7 @@
     font-size: 1rem;
 }
 
-.waveform-placeholder {
-    height: 100px;
-    background: var(--bg-secondary);
-    border-radius: 6px;
-}
+
 
 /* Performance Metrics */
 

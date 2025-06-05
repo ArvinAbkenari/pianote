@@ -55,7 +55,7 @@
                 <div class="waveform-comparison">
                     <div class="waveform original">
                         <h4>اصلی</h4>
-                        <div class="waveform-placeholder"></div>
+
                         <audio id="referenceAudioPlayer" controls style="width:100%;margin-top:10px;">
                           {% if selected_reference %}
                             <source src="{{ MEDIA_URL }}reference_audio/{{ selected_reference }}" type="audio/mpeg">
@@ -65,7 +65,6 @@
                     </div>
                     <div class="waveform practice">
                         <h4>تمرین شما</h4>
-                        <div class="waveform-placeholder"></div>
                         <audio id="userAudioPlayer" controls style="width:100%;margin-top:10px;"></audio>
                     </div>
                 </div>
