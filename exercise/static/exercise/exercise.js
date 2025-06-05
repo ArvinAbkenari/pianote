@@ -153,7 +153,51 @@ function setupAudioHandlers() {
     };
     referenceInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            referenceFileName.textContent = e.target.files[0].name;
+            // AJAX upload
+            const file = e.target.files[0];
+            referenceFileName.textContent = file.name;
+            const formData = new FormData();
+            formData.append('reference_audio', file);
+            fetch('/exercise/ajax/upload_reference/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken() },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Create new song card
+                    const songLibrary = document.querySelector('.song-library');
+                    const card = document.createElement('div');
+                    card.className = 'song-card';
+                    card.setAttribute('data-ref', data.filename);
+                    card.innerHTML = `
+                        <div class="song-info">
+                            <h3>${data.filename.length > 15 ? data.filename.slice(0, 15) + '...' : data.filename}</h3>
+                            <p>فایل مرجع</p>
+                        </div>
+                        <button type="button" class="select-btn">انتخاب</button>
+                    `;
+                    songLibrary.insertBefore(card, document.getElementById('referenceUploadCard'));
+                    // Add event listener for selection
+                    card.querySelector('.select-btn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected-song'));
+                        card.classList.add('selected-song');
+                        document.getElementById('selectedReferenceInput').value = data.filename;
+                        const referenceAudioPlayer = document.getElementById('referenceAudioPlayer');
+                        if (referenceAudioPlayer) {
+                            referenceAudioPlayer.src = `/media/reference_audio/${data.filename}`;
+                            referenceAudioPlayer.load();
+                        }
+                    });
+                } else {
+                    referenceFileName.textContent = 'خطا در بارگذاری';
+                }
+            })
+            .catch(() => {
+                referenceFileName.textContent = 'خطا در بارگذاری';
+            });
         } else {
             referenceFileName.textContent = '';
         }
@@ -165,6 +209,7 @@ function setupSongSelection() {
     const songCards = document.querySelectorAll('.song-card');
     const selectBtns = document.querySelectorAll('.select-btn');
     const selectedReferenceInput = document.getElementById('selectedReferenceInput');
+    const referenceAudioPlayer = document.getElementById('referenceAudioPlayer');
 
     songCards.forEach((card, idx) => {
         const btn = card.querySelector('.select-btn');
@@ -176,6 +221,11 @@ function setupSongSelection() {
             card.classList.add('selected-song');
             // Set hidden input value
             selectedReferenceInput.value = card.getAttribute('data-ref');
+            // Set reference audio player src
+            if (referenceAudioPlayer) {
+                referenceAudioPlayer.src = `/media/reference_audio/${card.getAttribute('data-ref')}`;
+                referenceAudioPlayer.load();
+            }
         });
     });
 }
@@ -183,9 +233,27 @@ function setupSongSelection() {
 // Handle audio file processing and visualization
 function handleAudioFile(file) {
     const fileURL = URL.createObjectURL(file);
-    const audioPlayer = document.getElementById('audioPlayer');
-    audioPlayer.src = fileURL;
-    audioPlayer.play();
+    const userAudioPlayer = document.getElementById('userAudioPlayer');
+    if (userAudioPlayer) {
+        userAudioPlayer.src = fileURL;
+        userAudioPlayer.load();
+    }
 
     // TODO: Add audio processing and visualization logic
+}
+
+// Helper to get CSRF token from cookie
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

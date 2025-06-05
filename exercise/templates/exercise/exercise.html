@@ -56,10 +56,17 @@
                     <div class="waveform original">
                         <h4>اصلی</h4>
                         <div class="waveform-placeholder"></div>
+                        <audio id="referenceAudioPlayer" controls style="width:100%;margin-top:10px;">
+                          {% if selected_reference %}
+                            <source src="{{ MEDIA_URL }}reference_audio/{{ selected_reference }}" type="audio/mpeg">
+                          {% endif %}
+                          Your browser does not support the audio element.
+                        </audio>
                     </div>
                     <div class="waveform practice">
                         <h4>تمرین شما</h4>
                         <div class="waveform-placeholder"></div>
+                        <audio id="userAudioPlayer" controls style="width:100%;margin-top:10px;"></audio>
                     </div>
                 </div>
             </div>
@@ -85,9 +92,9 @@
                                     fill="none"
                                     stroke="var(--accent-color)"
                                     stroke-width="3"
-                                    stroke-dasharray="{{ result.overall_score|default:75 }}, 100"/>
+                                    stroke-dasharray="{{ result.overall_score|default:0 }}, 100"/>
                             </svg>
-                            <span class="percentage">{{ result.overall_score|default:'75' }}%</span>
+                            <span class="percentage">{{ result.overall_score|default:'0' }}%</span>
                         </div>
                     </div>
                 </div>

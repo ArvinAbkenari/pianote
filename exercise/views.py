@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from users.forms import UserSignupForm
 from .forms import AudioUploadForm
+from django.http import JsonResponse
 import os
 import librosa
 import numpy as np
 
-REFERENCE_DIR = os.path.join(os.path.dirname(__file__), 'reference_audio')
+REFERENCE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'notes', 'media', 'reference_audio')
 os.makedirs(REFERENCE_DIR, exist_ok=True)
 
 def exercise_view(request):
@@ -87,3 +88,13 @@ def exercise_view(request):
         "reference_files": reference_files,
         "result": result
     })
+
+def ajax_upload_reference_audio(request):
+    if request.method == 'POST' and request.FILES.get('reference_audio'):
+        ref_file = request.FILES['reference_audio']
+        ref_path = os.path.join(REFERENCE_DIR, ref_file.name)
+        with open(ref_path, 'wb+') as dest:
+            for chunk in ref_file.chunks():
+                dest.write(chunk)
+        return JsonResponse({'success': True, 'filename': ref_file.name})
+    return JsonResponse({'success': False}, status=400)
