@@ -2,10 +2,10 @@
 {% load static %}
 {% block title %}تخمین قیمت پیانو - پیانوت{% endblock %}
 {% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'estimator/estimator.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
-
 
 {% block content %}
 
@@ -15,49 +15,68 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h2 class="mb-4 form-title text-center">تخمین قیمت پیانو</h2>
-                        <form id="piano-form" class="row g-3">
+                        <form id="piano-form" class="row g-3" method = "post">
+                            {% csrf_token %}
                             <div class="col-md-6">
                                 <label for="brand" class="form-label">برند</label>
-                                <select id="brand" class="form-select" required>
+                                <select id="brand" name = "brand" class="form-select" required>
                                     <option value="">انتخاب کنید...</option>
-                                    <option value="Yamaha">Yamaha</option>
-                                    <option value="Steinway & Sons">Steinway & Sons</option>
-                                    <option value="Kawai">Kawai</option>
-                                    <option value="Fazioli">Fazioli</option>
-                                    <option value="Bechstein">Bechstein</option>
-                                    <option value="Other">سایر</option>
+                                    {% for brand in brands%}
+                                        <option value="{{ brand }}">{{ brand }}</option>
+                                    {%endfor%}
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="model" class="form-label">مدل</label>
-                                <input type="text" id="model" class="form-control" placeholder="مدل پیانو" required>
+                                <select id="model" name = "model" class="form-select" required>
+                                <option value="">انتخاب کنید...</option>
+                                    {% for model in models%}
+                                        <option value="{{ model }}">{{ model }}</option>
+                                    {%endfor%}
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="dimension" class="form-label">ابعاد (سانتی‌متر)</label>
-                                <input type="number" id="dimension" class="form-control" placeholder="مثلاً 150" min="50" max="300" required>
+                                <input type="number" id="dimension" name="dimension" class="form-control" placeholder="مثلاً 150" min="50" max="300" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="material" class="form-label">جنس بدنه</label>
-                                <select id="material" class="form-select" required>
+                                <label for="material" class="form-label">رنگ بدنه</label>
+                                <select id="material" name = "material" class="form-select" required>
                                     <option value="">انتخاب کنید...</option>
-                                    <option value="چوب افرا">چوب افرا</option>
-                                    <option value="چوب گردو">چوب گردو</option>
-                                    <option value="چوب راش">چوب راش</option>
-                                    <option value="فلز">فلز</option>
-                                    <option value="Other">سایر</option>
+                                    {% for color in all_colors%}
+                                        <option value="{{ color }}">{{ color }}</option>
+                                    {%endfor%}
                                 </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="finish" class="form-label">جنس بدنه</label>
+                                <select id="finish" name = "finish" class="form-select" required>
+                                    <option value="">انتخاب کنید...</option>
+                                    {% for finish in all_finish%}
+                                        <option value="{{ finish }}">{{ finish }}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="types" class="form-label">نوع پیانو</label>
+                                <select id="types" name = "types" class="form-select" required>
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="vertical">vertical</option>
+                                    <option value="grand">grand</option>
+                                </select>                            
                             </div>
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary px-5">تخمین قیمت</button>
                             </div>
                         </form>
-                        <div id="result" class="mt-4 text-center" style="display:none;">
-                            <h4>قیمت تخمینی:</h4>
-                            <div id="estimated-price" class="fs-2 fw-bold text-success"></div>
+                        {% if prediction %}
+                        <div id="result" class="mt-4 text-center">
+                            <h4>قیمت تخمینی: <span class="fs-2 fw-bold text-success">{{ prediction }} تومان</span></h4>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
-                <div id="charts-section" class="card shadow-sm p-4" style="display:none;">
+                {% comment %} <div id="charts-section" class="card shadow-sm p-4" style="display:none;">
                     <h3 class="mb-4 text-center">آمار و نمودارها</h3>
                     <div class="row g-4">
                         <div class="col-md-6">
@@ -70,7 +89,7 @@
                             <canvas id="dimensionScatterChart"></canvas>
                         </div>
                     </div>
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
     </div>
@@ -78,5 +97,41 @@
 
 
     {% block extra_js %}
-    <script src="{% static "estimator/estimator.js"%}"></script>
+    {% comment %} <script src="{% static "estimator/estimator.js"%}"></script> {% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $('#brand').select2({
+            width: '100%',
+            selectionCssClass: 'form-select d-flex align-items-center px-0',
+
+            matcher: function(params, data) {
+                if ($.trim(params.term) === '') return data;
+                if (typeof data.text === 'undefined') return null;
+                if (data.text.toLowerCase().includes(params.term.toLowerCase())) return data;
+                return null;
+            }
+        });
+        $('#model').select2({
+            width: '100%',
+            selectionCssClass: 'form-select d-flex align-items-center px-0',
+
+            matcher: function(params, data) {
+                if ($.trim(params.term) === '') return data;
+                if (typeof data.text === 'undefined') return null;
+                if (data.text.toLowerCase().includes(params.term.toLowerCase())) return data;
+                return null;
+            }
+        });
+        $('#material').select2({
+            width: '100%',
+            selectionCssClass: 'form-select d-flex align-items-center px-0',
+
+            matcher: function(params, data) {
+                if ($.trim(params.term) === '') return data;
+                if (typeof data.text === 'undefined') return null;
+                if (data.text.toLowerCase().includes(params.term.toLowerCase())) return data;
+                return null;
+            }
+        });
+    </script>
     {% endblock %}

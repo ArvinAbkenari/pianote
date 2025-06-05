@@ -38,6 +38,8 @@ urlpatterns = [
     path("price-estimator/", estimator_view.estimator_view, name="estimator"),
     path("exercise/", exercise_view.exercise_view, name="exercise"),
     path("exercise/ajax/upload_reference/", exercise_view.ajax_upload_reference_audio, name="ajax_upload_reference"),
+    path("price-estimator/", estimator_view.estimator_view, name="estimator"),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
