@@ -26,7 +26,7 @@ class Note(models.Model):
     rate = models.FloatField()
     likes = models.IntegerField()
     views = models.IntegerField()
-    voters = models.IntegerField()
+    voters = models.JSONField(default=list)
     createdAt = models.DateTimeField()
     deleteFlag = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -45,6 +45,32 @@ class Note(models.Model):
             "deleteFlag": delete_flag
         }
         self.comments.append(comment)
+        self.save()
+    def add_like(self, user_id, text, createdDate, delete_flag=False):
+        # Convert datetime to ISO string for JSON serialization
+        if hasattr(createdDate, 'isoformat'):
+            createdDate = createdDate.isoformat()
+        # Update or add vote for this user
+        found = False
+        for v in self.voters:
+            if str(v.get("userID")) == str(user_id):
+                v["shape"] = text
+                v["createdAt"] = createdDate
+                v["deleteFlag"] = delete_flag
+                found = True
+                break
+        if not found:
+            vote = {
+                "userID": user_id,
+                "shape": text,
+                "createdAt": createdDate,
+                "deleteFlag": delete_flag
+            }
+            self.voters.append(vote)
+        # Recalculate rate: likes / total votes (excluding deleted votes)
+        likes = sum(1 for v in self.voters if v.get("shape") == "like" and not v.get("deleteFlag", False))
+        total = sum(1 for v in self.voters if not v.get("deleteFlag", False))
+        self.rate = (likes / total if total > 0 else 0) *5
         self.save()
     @staticmethod
     def generate_pdf_preview(pdf_path, output_path):

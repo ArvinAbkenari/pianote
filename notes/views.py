@@ -8,11 +8,26 @@ from django.conf import settings
 from django.db.models import Q, F
 from django.core.paginator import Paginator
 from pymongo import MongoClient
+from users.views import session_login_required
 
 # Create your views here.
 def notes_view(request):
     signup_form = UserSignupForm()
     notes = Note.objects.filter(deleteFlag=False)
+    for note in notes:
+        if note.notesheet and note.notesheet.path:
+            try:
+                import fitz  # PyMuPDF
+                doc = fitz.open(note.notesheet.path)
+                page = doc.load_page(0)
+                pix = page.get_pixmap()
+                img_bytes = pix.tobytes("png")
+                import base64
+                note.preview = base64.b64encode(img_bytes).decode('utf-8')
+            except Exception as e:
+                note.preview = None
+        else:
+            note.preview = None
     return render(request, "notes/sheets.html",{"form": signup_form , "notes": notes})
 
 
@@ -36,6 +51,10 @@ def note_detail_view(request, note_id):
     signup_form = UserSignupForm()
     try:
         note = Note.objects.get(id=note_id, deleteFlag=False)
+        # Only increment views if this is a GET request and not a redirect after POST
+        if request.method == "GET" and not request.GET.get("from_action"):
+            note.views += 1
+            note.save(update_fields=["views"])
     except Note.DoesNotExist:
         return render(request, "404.html", status=404)
 
@@ -48,15 +67,20 @@ def note_detail_view(request, note_id):
         except Exception:
             pdf_page_count = None
 
-    # Handle comment submission
     if request.method == "POST" and request.session.get("user_id"):
-        comment_text = request.POST.get("comment_text", "").strip()
-        if comment_text:
-            user_id = request.session["user_id"]
-            note.add_comment(user_id, comment_text, timezone.now())
-        # After posting, redirect to avoid resubmission
-        return redirect(request.path)
-
+        form_type = request.POST.get("form_type")
+        user_id = request.session["user_id"]
+        if form_type == "comment":
+            comment_text = request.POST.get("comment_text", "").strip()
+            if comment_text:
+                note.add_comment(user_id, comment_text, timezone.now())
+        elif form_type == "voting":
+            vote_shape = request.POST.get("vote")
+            if vote_shape:
+                note.add_like(user_id, vote_shape, timezone.now())
+        # Redirect with a query param to prevent view increment
+        return redirect(f"{request.path}?from_action=1")
+    
     # Attach user fullName to each comment
     from users.models import User
     comments = []
@@ -68,10 +92,18 @@ def note_detail_view(request, note_id):
         except User.DoesNotExist:
             comment["fullName"] = "کاربر حذف شده"
         comments.append(comment)
+        
+    my_vote = None
+    if request.session.get("user_id"):
+        user_id = str(request.session["user_id"])
+        for v in note.voters:
+            if str(v.get("userID")) == user_id and not v.get("deleteFlag", False):
+                my_vote = v.get("shape")
+                break
+    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form,
+                                                            "comments": comments, "pdf_page_count": pdf_page_count , "my_vote": my_vote,})
 
-    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form, "comments": comments, "pdf_page_count": pdf_page_count})
-
-
+@session_login_required
 def notes_list(request):
     # Extract MongoDB URI and database name from settings
     mongo_uri = "mongodb://localhost:27017/"

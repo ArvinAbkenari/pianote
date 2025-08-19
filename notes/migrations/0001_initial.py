@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('level', models.CharField(choices=[(1, 'مبتدی'), (2, 'متوسط'), (3, 'پیشرفته')], max_length=1)),
                 ('rate', models.FloatField()),
                 ('likes', models.IntegerField()),
-                ('voters', models.IntegerField()),
+                ('voters', models.JSONField(default=list)),
                 ('views', models.IntegerField()),
                 ('createdAt', models.DateTimeField()),
                 ('deleteFlag', models.BooleanField(default=False)),

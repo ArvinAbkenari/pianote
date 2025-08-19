@@ -6,6 +6,7 @@ import numpy as np
 import os
 from django.conf import settings
 import ast
+from users.views import session_login_required
 
 
 pipeline = joblib.load(os.path.join(settings.BASE_DIR, "model_pipeline.pkl"))
@@ -16,7 +17,7 @@ color_binarizer = pipeline["color_binarizer"]
 finish_binarizer = pipeline["finish_binarizer"]
 
 # Create your views here.
-
+@session_login_required
 def estimator_view(request):
     signup_form = UserSignupForm()
     prediction = None
