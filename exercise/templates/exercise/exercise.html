@@ -74,58 +74,45 @@
 
         <section class="performance-metrics">
             <h2>تحلیل عملکرد</h2>
-            <div class="row g-4 metrics-grid">
-                <div class="col-3 col-md-3">
-                    <div class="metric-card h-100">
-                        <h3>امتیاز دقت</h3>
-                        <div class="score-circle">
-                            <svg viewBox="0 0 36 36" class="circular-chart">
-                                <path d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#eee"
-                                    stroke-width="3"/>
-                                <path d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="var(--accent-color)"
-                                    stroke-width="3"
-                                    stroke-dasharray="{{ result.overall_score|default:0 }}, 100"/>
-                            </svg>
-                            <span class="percentage">{{ result.overall_score|default:'0' }}%</span>
-                        </div>
+            <div class="metrics-grid">
+                <div class="metric-card overall-score">
+                    <div class="metric-header">
+                        <i class="bi bi-star-fill"></i>
+                        <h3>امتیاز کلی</h3>
                     </div>
+                    <div class="score">{{ result.overall_score|default:'0' }}<span class="percentage">%</span></div>
                 </div>
-                <div class="col-9 col-md-9">
-                    <div class="metric-card h-100">
-                        <h3>دقت زمان‌بندی</h3>
-                        <div id="timingChart" class="chart-container">
-                            <canvas id="timingCanvas"></canvas>
+                <div class="metric-cards-container">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="bi bi-music-note"></i>
+                            <h3>دقت نت‌ها</h3>
                         </div>
+                        <div class="score">{{ result.pitch_score|default:'0' }}<span class="percentage">%</span></div>
                     </div>
-                </div>
-                <div class="col-12 col-md-12">
-                    <div class="metric-card h-100">
-                        <h3>دقت نت‌ها</h3>
-                        <div id="noteChart" class="chart-container">
-                            <canvas id="noteCanvas"></canvas>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="bi bi-clock"></i>
+                            <h3>دقت زمان‌بندی</h3>
                         </div>
+                        <div class="score">{{ result.tempo_diff_percentage|default:'0' }}<span class="percentage">%</span></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="bi bi-volume-up"></i>
+                            <h3>دقت صدا</h3>
+                        </div>
+                        <div class="score">{{ result.energy_score|default:'0' }}<span class="percentage">%</span></div>
                     </div>
                 </div>
             </div>
         </section>
-        <div style="margin-top:2rem;">
-            {% if result %}
-                {% if result.error %}
-                    <div class="alert alert-danger">خطا: {{ result.error }}</div>
-                {% else %}
-                    <div class="alert alert-success">امتیاز کلی: {{ result.overall_score }}/100 | امتیاز نت: {{ result.pitch_score|floatformat:1 }}/100 | امتیاز زمان‌بندی: {{ result.timing_score|floatformat:1 }}/100</div>
-                {% endif %}
-            {% endif %}
-        </div>
-
+        {% if result.error %}
+            <div class="error-message">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>خطا: {{ result.error }}</span>
+            </div>
+        {% endif %}
     </form>
 </div>
 {% endblock %}

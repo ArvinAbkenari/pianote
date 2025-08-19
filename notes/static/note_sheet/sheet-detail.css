@@ -134,6 +134,21 @@
     margin-bottom: 0.5rem;
 }
 
+
+/* Like/Dislike Icon Colors */
+.bi-hand-thumbs-up-fill,
+.bi-hand-thumbs-down-fill {
+    /* light for dark mode */
+    --icon-active: #F7FAFC;
+    --icon-active: #F7FAFC;
+    --icon-inactive: #636E72;
+}
+
+.bi-hand-thumbs-up,
+.bi-hand-thumbs-down {
+    color: var(--icon-inactive) !important;
+    transition: color 0.3s;
+}
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .sheet-title {

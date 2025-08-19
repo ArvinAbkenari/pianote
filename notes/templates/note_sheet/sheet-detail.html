@@ -37,10 +37,10 @@
                   <input type="hidden" name="vote" value="like" id="like-vote-input">
                   <input type="hidden" name="vote" value="dislike" id="dislike-vote-input">
                   <span class="vote-icon like-icon {% if my_vote == 'like' %}active{% endif %}" style="font-size:1.3rem; cursor:pointer; vertical-align:middle;">
-                    <i class="bi {% if my_vote == 'like' %}bi-hand-thumbs-up-fill{% else %}bi-hand-thumbs-up{% endif %}" style="color: {% if my_vote == 'like' %}black{% else %}#888{% endif %};"></i>
+                    <i class="bi {% if my_vote == 'like' %}bi-hand-thumbs-up-fill{% else %}bi-hand-thumbs-up{% endif %}" ></i>
                   </span>
                   <span class="vote-icon dislike-icon ms-2 {% if my_vote == 'dislike' %}active{% endif %}" style="font-size:1.3rem; cursor:pointer; vertical-align:middle;">
-                    <i class="bi {% if my_vote == 'dislike' %}bi-hand-thumbs-down-fill{% else %}bi-hand-thumbs-down{% endif %}" style="color: {% if my_vote == 'dislike' %}black{% else %}#888{% endif %};"></i>
+                    <i class="bi {% if my_vote == 'dislike' %}bi-hand-thumbs-down-fill{% else %}bi-hand-thumbs-down{% endif %}" ></i>
                   </span>
                 </form>
                 <style>

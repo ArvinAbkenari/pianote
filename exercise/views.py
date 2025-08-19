@@ -88,31 +88,38 @@ def pitch_histogram(pitches, bins=36):
 def evaluate_performance(ref_feats, stu_feats):
     results = {}
     # similarity features
-    mfcc_sim = 1 - cosine(ref_feats['mfccs'], stu_feats['mfccs'])
-    chroma_sim = 1 - cosine(ref_feats['chroma'], stu_feats['chroma'])
-    contrast_sim = 1 - cosine(ref_feats['contrast'], stu_feats['contrast'])
-    tonnetz_sim = 1 - cosine(ref_feats['tonnetz'], stu_feats['tonnetz'])
+    mfcc_sim = float(1 - cosine(ref_feats['mfccs'], stu_feats['mfccs']))
+    chroma_sim = float(1 - cosine(ref_feats['chroma'], stu_feats['chroma']))
+    contrast_sim = float(1 - cosine(ref_feats['contrast'], stu_feats['contrast']))
+    tonnetz_sim = float(1 - cosine(ref_feats['tonnetz'], stu_feats['tonnetz']))
     # pitch
     ref_hist = pitch_histogram(ref_feats['pitches'])
     stu_hist = pitch_histogram(stu_feats['pitches'])
-    pitch_sim = 1 - cosine(ref_hist, stu_hist)
-    pitch_score = round(pitch_sim * 100, 2)
+    pitch_sim = float(1 - cosine(ref_hist, stu_hist))
+    pitch_score = round(float(pitch_sim * 100), 2)
     results['pitch_score'] = pitch_score
     # tempo
-    tempo_diff = abs(float(ref_feats['tempo']) - float(stu_feats['tempo']))
-    tempo_score = max(0, 100 - tempo_diff * 8)
-    results['tempo_score'] = round(tempo_score, 2)
+    ref_tempo = float(ref_feats['tempo'])
+    stu_tempo = float(stu_feats['tempo'])
+    # Calculate percentage difference relative to reference tempo
+    tempo_diff = abs(ref_tempo - stu_tempo)
+    tempo_diff_percentage = (tempo_diff / ref_tempo) * 100
+    # Use sigmoid-like scoring that's more sensitive to small differences
+    # but more forgiving for larger differences
+    tempo_score = 100 * (1 / (1 + (tempo_diff_percentage / 15)**2))
+    results['tempo_score'] = round(float(tempo_score), 2)
     results['tempo_diff'] = round(float(tempo_diff), 2)
+    results['tempo_diff_percentage'] = round(float(tempo_diff_percentage), 2)
     # energy
-    energy_score = max(0, 100 - abs(np.mean(ref_feats['energy']) - np.mean(stu_feats['energy'])) * 1000)
-    results['energy_score'] = round(energy_score, 2)
+    energy_score = float(max(0, 100 - abs(float(np.mean(ref_feats['energy'])) - float(np.mean(stu_feats['energy']))) * 1000))
+    results['energy_score'] = round(float(energy_score), 2)
     # similarity avg
-    sim_total = (mfcc_sim + chroma_sim + contrast_sim + tonnetz_sim) / 4
-    sim_score = round(sim_total * 100, 2)
+    sim_total = float((mfcc_sim + chroma_sim + contrast_sim + tonnetz_sim) / 4)
+    sim_score = round(float(sim_total * 100), 2)
     results['similarity_score'] = sim_score
     # final weighted
-    final_score = (0.5 * pitch_score) + (0.15 * tempo_score) + (0.15 * energy_score) + (0.2 * sim_score)
-    results['overall_score'] = round(final_score, 2)
+    final_score = float((0.5 * pitch_score) + (0.15 * tempo_score) + (0.15 * energy_score) + (0.2 * sim_score))
+    results['overall_score'] = round(float(final_score), 2)
     return results
 
 # ---------- Django views ----------
