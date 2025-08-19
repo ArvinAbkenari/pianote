@@ -62,7 +62,7 @@ function setupAudioHandlers() {
         if (e.target.files.length > 0) {
             // AJAX upload
             const file = e.target.files[0];
-            referenceFileName.textContent = file.name;
+
             const formData = new FormData();
             formData.append('reference_audio', file);
             fetch('/exercise/ajax/upload_reference/', {
