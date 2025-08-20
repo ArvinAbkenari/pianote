@@ -288,6 +288,79 @@
 }
 
 /* Responsive Design */
+/* Modal Styles */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1040;
+    backdrop-filter: blur(4px);
+    transition: opacity var(--transition-time) ease;
+}
+
+.modal-custom {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    z-index: 1050;
+    min-width: 320px;
+    max-width: 90vw;
+    padding: 2rem;
+    opacity: 0;
+    transform: translate(-50%, -45%);
+    transition: all var(--transition-time) ease;
+}
+
+.modal-custom.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color var(--transition-time) ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.modal-title {
+    color: var(--text-primary);
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .modal-custom {
+    background: var(--card-bg);
+    box-shadow: var(--card-hover-shadow);
+}
+
+[data-theme="dark"] .modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
 @media (max-width: 768px) {
     .dashboard-container {
         padding: 1rem;

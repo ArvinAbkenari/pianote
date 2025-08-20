@@ -140,6 +140,7 @@ def exercise_view(request):
     create_form = ExerciseCreateForm()
 
     reference_files = []  # now just the uploaded files
+    selected_ex_id = None
 
     if request.method == 'POST' and audio_form.is_valid():
         ref_file = audio_form.cleaned_data.get('reference_audio')
@@ -147,7 +148,6 @@ def exercise_view(request):
 
         if ref_file:
             reference_files.append(ref_file.name)
-
         if ref_file and user_file:
             try:
                 # Load reference audio in memory
@@ -162,6 +162,29 @@ def exercise_view(request):
 
                 result = evaluate_performance(ref_feats, stu_feats)
 
+                # Persist metrics to the selected exercise if provided
+                selected_ex_id = request.POST.get('selected_exercise') or request.POST.get('selectedExercise') or None
+                if selected_ex_id:
+                    try:
+                        ex = Exercise.objects.get(id=selected_ex_id, user_id=request.user, deleteFlag=False)
+                        # add_metrics expects createdDate and scores
+                        createdDate = None
+                        # try to get createdAt from result or use now
+                        if isinstance(result, dict) and result.get('createdAt'):
+                            createdDate = result.get('createdAt')
+                        from django.utils import timezone
+                        if not createdDate:
+                            createdDate = timezone.now()
+                        # map values
+                        pitch = result.get('pitch_score') or result.get('pitch') or 0
+                        tempo = result.get('tempo_score') or result.get('tempo') or 0
+                        energy = result.get('energy_score') or result.get('energy') or 0
+                        final = result.get('overall_score') or result.get('final_score') or 0
+                        ex.add_metrics(pitch, tempo, energy, final, createdDate)
+                    except Exercise.DoesNotExist:
+                        # ignore if exercise not found or not authorized
+                        pass
+
             except Exception as e:
                 result = {'error': str(e)}
 
@@ -170,8 +193,9 @@ def exercise_view(request):
         "audio_form": audio_form,
         "reference_files": reference_files,
         "result": result,
-        "exercises": exercises,
-        "create_form": create_form
+    "exercises": exercises,
+    "create_form": create_form,
+    "selected_exercise": selected_ex_id
     })
     
 def load_and_extract_features_from_array(y, sr):
@@ -201,6 +225,34 @@ def ajax_upload_reference_audio(request):
                 dest.write(chunk)
         return JsonResponse({'success': True, 'filename': ref_file.name})
     return JsonResponse({'success': False}, status=400)
+
+
+def ajax_exercise_metrics(request, exercise_id):
+    """Return JSON metrics for a specific exercise belonging to the logged-in user."""
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'error': 'GET required'}, status=400)
+    try:
+        ex = Exercise.objects.get(id=exercise_id, deleteFlag=False, user_id=request.user)
+    except Exercise.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'exercise not found'}, status=404)
+
+    metrics = ex.metrics or []
+    normalized = []
+    for m in metrics:
+        normalized.append({
+            'pitch_score': m.get('pitch_score') or m.get('pitch') or m.get('pitchScore'),
+            'tempo_score': m.get('tempo_score') or m.get('tempo') or m.get('tempoScore'),
+            'energy_score': m.get('energy_score') or m.get('energy') or m.get('energyScore'),
+            'final_score': m.get('final_score') or m.get('overall_score') or m.get('finalScore') or m.get('overallScore'),
+            'createdAt': m.get('createdAt') or m.get('created_at') or m.get('createdAt') or ''
+        })
+
+    try:
+        normalized.sort(key=lambda x: x.get('createdAt') or '')
+    except Exception:
+        pass
+
+    return JsonResponse({'success': True, 'metrics': normalized})
 
 def exercise_create(request):
     if request.method == 'POST':

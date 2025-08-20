@@ -1,6 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     setupAudioHandlers();
     setupSongSelection();
+    initInitialUIState();
+    handleServerResult();
+    const selectedInput = document.getElementById('selectedExerciseInput');
+    if (selectedInput && selectedInput.value) {
+        const exerciseId = selectedInput.value;
+        // find card and mark selected
+        const card = document.querySelector(`.song-card[data-exercise-id="${exerciseId}"]`);
+        if (card) {
+            // simulate clicking the select button to reuse logic
+            const btn = card.querySelector('.select-btn');
+            if (btn) btn.click();
+        }
+    }
 });
 
 
@@ -158,6 +171,50 @@ function setupSongSelection() {
     const selectBtns = document.querySelectorAll('.select-btn');
     const selectedReferenceInput = document.getElementById('selectedReferenceInput');
     const referenceAudioPlayer = document.getElementById('referenceAudioPlayer');
+    const refUpload = document.getElementById('refUpload');
+    const practiceUpload = document.getElementById('practiceUpload');
+    const metricsArea = document.getElementById('metricsArea');
+
+    // when exercise selected, fetch metrics and render chart via global helpers
+    async function fetchAndRenderMetrics(exerciseId) {
+        try {
+            const res = await fetch(`/exercise/ajax/metrics/${exerciseId}/`);
+            const data = await res.json();
+            if (!data.success) {
+                console.warn('metrics fetch failed', data);
+                return;
+            }
+            const metrics = data.metrics || [];
+            const labels = metrics.map(m => m.createdAt ? new Date(m.createdAt).toLocaleString() : '');
+            const pitch = metrics.map(m => Number(m.pitch_score) || 0);
+            const tempo = metrics.map(m => Number(m.tempo_score) || 0);
+            const energy = metrics.map(m => Number(m.energy_score) || 0);
+            const finalS = metrics.map(m => Number(m.final_score) || 0);
+            if (!metrics.length) {
+                // hide performance metrics and clear chart
+                const perf = document.getElementById('performanceMetrics');
+                if (perf) perf.style.display = 'none';
+                updateGlobalChart([], [], [], [], []);
+            } else {
+                // show and populate latest metric
+                const perf = document.getElementById('performanceMetrics');
+                if (perf) perf.style.display = '';
+                const latest = metrics[metrics.length - 1];
+                // update metric cards
+                const overallEl = document.getElementById('overallScoreValue');
+                const pitchEl = document.getElementById('pitchScoreValue');
+                const tempoEl = document.getElementById('tempoScoreValue');
+                const energyEl = document.getElementById('energyScoreValue');
+                if (overallEl) overallEl.textContent = latest.final_score ?? latest.overall_score ?? '0';
+                if (pitchEl) pitchEl.textContent = latest.pitch_score ?? '0';
+                if (tempoEl) tempoEl.textContent = latest.tempo_score ?? latest.tempo_diff_percentage ?? '0';
+                if (energyEl) energyEl.textContent = latest.energy_score ?? '0';
+                updateGlobalChart(labels, pitch, tempo, energy, finalS);
+            }
+        } catch (err) {
+            console.error('failed to load metrics', err);
+        }
+    }
 
     songCards.forEach((card, idx) => {
         const btn = card.querySelector('.select-btn');
@@ -167,24 +224,115 @@ function setupSongSelection() {
             songCards.forEach(c => c.classList.remove('selected-song'));
             // Highlight this card
             card.classList.add('selected-song');
-            // Set hidden input value
-            selectedReferenceInput.value = card.getAttribute('data-ref');
-            // Set reference audio player src
-            if (referenceAudioPlayer) {
-                referenceAudioPlayer.src = `/media/reference_audio/${card.getAttribute('data-ref')}`;
-                referenceAudioPlayer.load();
+            // show upload boxes and metrics
+            if (refUpload) refUpload.style.display = '';
+            if (practiceUpload) practiceUpload.style.display = '';
+            if (metricsArea) metricsArea.style.display = '';
+            // show practice section and analyze button
+            const practiceSection = document.getElementById('practiceSection');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (practiceSection) practiceSection.style.display = '';
+            if (analyzeBtn) analyzeBtn.style.display = '';
+
+            const exerciseId = card.getAttribute('data-exercise-id');
+            const selectedExerciseInput = document.getElementById('selectedExerciseInput');
+            if (selectedExerciseInput) selectedExerciseInput.value = exerciseId || '';
+            if (exerciseId) {
+                fetchAndRenderMetrics(exerciseId);
             }
         });
     });
+}
+
+// Global chart helpers — used both for AJAX metrics and server-returned single result
+let globalMetricsChart = null;
+function ensureGlobalChart() {
+    const canvas = document.getElementById('metricsChart');
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d');
+    if (globalMetricsChart) return globalMetricsChart;
+    globalMetricsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'pitch_score', data: [], borderColor: '#3182CE', backgroundColor: 'rgba(49,130,206,0.08)', tension: 0.3 },
+                { label: 'tempo_score', data: [], borderColor: '#38A169', backgroundColor: 'rgba(56,161,105,0.08)', tension: 0.3 },
+                { label: 'energy_score', data: [], borderColor: '#E53E3E', backgroundColor: 'rgba(229,62,62,0.08)', tension: 0.3 },
+                { label: 'final_score', data: [], borderColor: '#805AD5', backgroundColor: 'rgba(128,90,213,0.08)', tension: 0.3 }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top' } },
+            scales: { x: { display: true, title: { display: true, text: 'زمان' } }, y: { beginAtZero: true, max: 100 } }
+        }
+    });
+    return globalMetricsChart;
+}
+
+function updateGlobalChart(labels, pitch, tempo, energy, finalS) {
+    const chart = ensureGlobalChart();
+    if (!chart) return;
+    chart.data.labels = labels || [];
+    chart.data.datasets[0].data = pitch || [];
+    chart.data.datasets[1].data = tempo || [];
+    chart.data.datasets[2].data = energy || [];
+    chart.data.datasets[3].data = finalS || [];
+    chart.update();
+}
+
+function handleServerResult() {
+    // If server provided `result`, Django rendered it via json_script with id chartjsResultData
+    const jsonEl = document.getElementById('chartjsResultData');
+    if (!jsonEl) return;
+    let result = {};
+    try {
+        result = JSON.parse(jsonEl.textContent || jsonEl.innerText || '{}');
+    } catch (e) {
+        console.warn('failed to parse server result', e);
+        return;
+    }
+    // show performance metrics area
+    const perf = document.getElementById('performanceMetrics');
+    if (perf) perf.style.display = '';
+    const metricsArea = document.getElementById('metricsArea');
+    if (metricsArea) metricsArea.style.display = '';
+    // create single-point chart from result
+    const label = result.createdAt ? new Date(result.createdAt).toLocaleString() : new Date().toLocaleString();
+    const labels = [label];
+    const pitch = [Number(result.pitch_score) || Number(result.pitch) || 0];
+    const tempo = [Number(result.tempo_score) || Number(result.tempo) || 0];
+    const energy = [Number(result.energy_score) || Number(result.energy) || 0];
+    const finalS = [Number(result.overall_score) || Number(result.final_score) || 0];
+    updateGlobalChart(labels, pitch, tempo, energy, finalS);
+}
+
+function initInitialUIState() {
+    const refUpload = document.getElementById('refUpload');
+    const practiceUpload = document.getElementById('practiceUpload');
+    const metricsArea = document.getElementById('metricsArea');
+    // hide by default (already hidden inline), ensure JS-enforced
+    if (refUpload) refUpload.style.display = 'none';
+    if (practiceUpload) practiceUpload.style.display = 'none';
+    if (metricsArea) metricsArea.style.display = 'none';
 }
 
 // Handle audio file processing and visualization
 function handleAudioFile(file) {
     const fileURL = URL.createObjectURL(file);
     const userAudioPlayer = document.getElementById('userAudioPlayer');
+    const userAudioWave = document.getElementById('userAudioWave');
     if (userAudioPlayer) {
         userAudioPlayer.src = fileURL;
         userAudioPlayer.load();
+        userAudioPlayer.style.display = '';
+    }
+    if (userAudioWave) {
+        userAudioWave.src = fileURL;
+        userAudioWave.load();
+        userAudioWave.style.display = '';
     }
 
 }
@@ -192,9 +340,16 @@ function handleAudioFile(file) {
 function handleAudioFileref(file) {
     const fileURL = URL.createObjectURL(file);
     const refAudioPlayer = document.getElementById('refAudioPlayer');
+    const refAudioWave = document.getElementById('refAudioWave');
     if (refAudioPlayer) {
         refAudioPlayer.src = fileURL;
         refAudioPlayer.load();
+        refAudioPlayer.style.display = '';
+    }
+    if (refAudioWave) {
+        refAudioWave.src = fileURL;
+        refAudioWave.load();
+        refAudioWave.style.display = '';
     }
 }
 

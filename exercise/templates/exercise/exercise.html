@@ -13,15 +13,16 @@
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+    <input type="hidden" name="selected_exercise" id="selectedExerciseInput" value="{{ selected_exercise|default:'' }}">
 
         <section class="song-selection-section">
             <h2>تمرین خود را انتخاب کنید</h2>
             <div class="song-library">
                 {% for exercise in exercises %}
-                <div class="song-card">
+                <div class="song-card" data-exercise-id="{{ exercise.id }}">
                     <div class="song-info">
                         <h3>{{ exercise.title }}</h3>
-                        <p>تمرین انتخابی</p>
+                        <p>{{ exercise.metrics|length }} رکورد</p>
                     </div>
                     <button type="button" class="select-btn">انتخاب</button>
                 </div>
@@ -33,13 +34,13 @@
             </div>
         </section>
 
-        <!-- Practice Section -->
-        <section class="practice-section">
+    <!-- Practice Section (hidden until an exercise is selected) -->
+    <section id="practiceSection" class="practice-section" style="display:none;">
             <h2>فایل های شما</h2>
             <div class="upload-container" style="display:flex;gap:20px;flex-wrap:wrap;">
                 
                 <!-- Reference Upload -->
-                <div class="upload-box" id="refUpload" style="flex:1;position:relative;">
+                <div class="upload-box" id="refUpload" style="flex:1;position:relative;display:none;">
                     <i class="bi bi-mic-fill"></i>
                     <p>بارگذاری قطعه مرجع</p>
                     <span>یا فایل صوتی را بکشید و رها کنید</span>
@@ -48,7 +49,7 @@
                 </div>
 
                 <!-- User Upload -->
-                <div class="upload-box" id="practiceUpload" style="flex:1;position:relative;">
+                <div class="upload-box" id="practiceUpload" style="flex:1;position:relative;display:none;">
                     <i class="bi bi-mic-fill"></i>
                     <p>بارگذاری ضبط تمرین شما</p>
                     <span>یا فایل صوتی را بکشید و رها کنید</span>
@@ -61,25 +62,22 @@
                 <div class="waveform-comparison">
                     <div class="waveform original">
                         <h4>اصلی</h4>
-                        <audio id="refAudioPlayer" controls style="width:100%;margin-top:10px;">
-                            {% if selected_reference %}
-                                <source src="{{ MEDIA_URL }}reference_audio/{{ selected_reference }}" type="audio/mpeg">
-                            {% endif %}
+                        <audio id="refAudioWave" controls style="width:100%;margin-top:10px;display:none;">
                             مرورگر شما از این عنصر پشتیبانی نمی‌کند.
                         </audio>
                     </div>
                     <div class="waveform practice">
                         <h4>تمرین شما</h4>
-                        <audio id="userAudioPlayer" controls style="width:100%;margin-top:10px;"></audio>
+                        <audio id="userAudioWave" controls style="width:100%;margin-top:10px;display:none;"></audio>
                     </div>
                 </div>
             </div>
         </section>
 
-        <button type="submit" class="btn btn-primary mb-5 w-100 p-3" style="font-size: 20px;">تحلیل کن</button>
+    <button id="analyzeBtn" type="submit" class="btn btn-primary mb-5 w-100 p-3" style="font-size: 20px;display:none;">تحلیل کن</button>
 
-        <!-- Performance Metrics -->
-        <section class="performance-metrics">
+    <!-- Performance Metrics (hidden until analysis result) -->
+    <section id="performanceMetrics" class="performance-metrics" style="display:none;">
             <h2>تحلیل عملکرد</h2>
             <div class="metrics-grid">
                 <div class="metric-card overall-score">
@@ -87,7 +85,7 @@
                         <i class="bi bi-star-fill"></i>
                         <h3>امتیاز کلی</h3>
                     </div>
-                    <div class="score">{{ result.overall_score|default:'0' }}<span class="percentage">%</span></div>
+                    <div class="score"><span id="overallScoreValue">{{ result.overall_score|default:'0' }}</span><span class="percentage">%</span></div>
                 </div>
                 <div class="metric-cards-container">
                     <div class="metric-card">
@@ -95,21 +93,21 @@
                             <i class="bi bi-music-note"></i>
                             <h3>دقت نت‌ها</h3>
                         </div>
-                        <div class="score">{{ result.pitch_score|default:'0' }}<span class="percentage">%</span></div>
+                        <div class="score"><span id="pitchScoreValue">{{ result.pitch_score|default:'0' }}</span><span class="percentage">%</span></div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-header">
                             <i class="bi bi-clock"></i>
                             <h3>دقت زمان‌بندی</h3>
                         </div>
-                        <div class="score">{{ result.tempo_diff_percentage|default:'0' }}<span class="percentage">%</span></div>
+                        <div class="score"><span id="tempoScoreValue">{{ result.tempo_diff_percentage|default:'0' }}</span><span class="percentage">%</span></div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-header">
                             <i class="bi bi-volume-up"></i>
                             <h3>دقت صدا</h3>
                         </div>
-                        <div class="score">{{ result.energy_score|default:'0' }}<span class="percentage">%</span></div>
+                        <div class="score"><span id="energyScoreValue">{{ result.energy_score|default:'0' }}</span><span class="percentage">%</span></div>
                     </div>
                 </div>
             </div>
@@ -121,15 +119,19 @@
             <span>خطا: {{ result.error }}</span>
         </div>
         {% endif %}
+        <!-- Chart moved below everything -->
+        <div id="metricsArea" style="margin-top:20px;display:none;">
+            <canvas id="metricsChart" style="width:100%;height:320px;"></canvas>
+        </div>
     </form>
 </div>
     <!-- Modal Backdrop -->
-    <div class="modal-backdrop" id="modalBackdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1040;"></div>
+    <div class="modal-backdrop" id="modalBackdrop"></div>
 
     <!-- Modal -->
-    <div class="modal-custom" id="exerciseModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1050;min-width:320px;max-width:90vw;padding:2rem;">
-        <span class="modal-close" id="modalClose" style="position:absolute;top:1rem;left:1rem;font-size:1.5rem;cursor:pointer;color:#888;">&times;</span>
-        <h2 class="mb-3">ایجاد تمرین جدید</h2>
+    <div class="modal-custom" id="exerciseModal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <h2 class="modal-title mb-3">ایجاد تمرین جدید</h2>
         <form method="post" action="{% url 'exercise_create' %}">
             {% csrf_token %}
             <div class="form-group mb-3">
@@ -157,22 +159,29 @@
     const closeBtn = document.getElementById('modalClose');
 
     if(referenceUploadCard && modal && backdrop && closeBtn) {
-        referenceUploadCard.onclick = function() {
-            modal.style.display = 'block';
+        function showModal() {
             backdrop.style.display = 'block';
+            modal.style.display = 'block';
+            // Trigger reflow
+            modal.offsetHeight;
+            modal.classList.add('show');
             setTimeout(() => {
                 const input = modal.querySelector('input[name="title"]');
                 if(input) input.focus();
             }, 100);
-        };
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-            backdrop.style.display = 'none';
-        };
-        backdrop.onclick = function() {
-            modal.style.display = 'none';
-            backdrop.style.display = 'none';
-        };
+        }
+
+        function hideModal() {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                backdrop.style.display = 'none';
+            }, 300); // Match the transition time
+        }
+
+        referenceUploadCard.onclick = showModal;
+        closeBtn.onclick = hideModal;
+        backdrop.onclick = hideModal;
     }
 </script>
 {% endblock %}
