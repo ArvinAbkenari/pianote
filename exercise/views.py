@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from users.forms import UserSignupForm
-from .forms import AudioUploadForm
+from .forms import AudioUploadForm, ExerciseCreateForm
 from django.http import JsonResponse
 import os
 import librosa
@@ -9,6 +9,12 @@ from users.views import session_login_required
 from scipy.spatial.distance import cosine
 from scipy.signal import butter, filtfilt
 import tempfile
+from .models import Exercise
+from .models import User
+
+import secrets
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
 REFERENCE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'notes', 'media', 'reference_audio')
 os.makedirs(REFERENCE_DIR, exist_ok=True)
@@ -123,41 +129,38 @@ def evaluate_performance(ref_feats, stu_feats):
     return results
 
 # ---------- Django views ----------
+import io
 
 @session_login_required
 def exercise_view(request):
+    exercises = Exercise.objects.filter(deleteFlag=False, user_id=request.user)
     signup_form = UserSignupForm()
     result = None
     audio_form = AudioUploadForm(request.POST or None, request.FILES or None)
-    reference_files = [f for f in os.listdir(REFERENCE_DIR) if f.lower().endswith(('.wav', '.mp3'))]
+    create_form = ExerciseCreateForm()
+
+    reference_files = []  # now just the uploaded files
 
     if request.method == 'POST' and audio_form.is_valid():
         ref_file = audio_form.cleaned_data.get('reference_audio')
+        user_file = audio_form.cleaned_data.get('user_audio')
+
         if ref_file:
-            ref_path = os.path.join(REFERENCE_DIR, ref_file.name)
-            with open(ref_path, 'wb+') as dest:
-                for chunk in ref_file.chunks():
-                    dest.write(chunk)
             reference_files.append(ref_file.name)
 
-        user_file = audio_form.cleaned_data.get('user_audio')
-        selected_ref = request.POST.get('selected_reference')
-        if user_file and selected_ref:
-            ref_path = os.path.join(REFERENCE_DIR, selected_ref)
+        if ref_file and user_file:
             try:
-                # save uploaded user audio safely
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                    for chunk in user_file.chunks():
-                        tmp.write(chunk)
-                    user_path = tmp.name
+                # Load reference audio in memory
+                ref_bytes = io.BytesIO(ref_file.read())
+                ref_y, ref_sr = librosa.load(ref_bytes, sr=None)
+                ref_feats = load_and_extract_features_from_array(ref_y, ref_sr)
 
-                # extract features
-                ref_feats = load_and_extract_features(ref_path)
-                stu_feats = load_and_extract_features(user_path)
+                # Load user audio in memory
+                user_bytes = io.BytesIO(user_file.read())
+                stu_y, stu_sr = librosa.load(user_bytes, sr=None)
+                stu_feats = load_and_extract_features_from_array(stu_y, stu_sr)
 
                 result = evaluate_performance(ref_feats, stu_feats)
-                # cleanup temp file
-                os.unlink(user_path)
 
             except Exception as e:
                 result = {'error': str(e)}
@@ -166,8 +169,28 @@ def exercise_view(request):
         "form": signup_form,
         "audio_form": audio_form,
         "reference_files": reference_files,
-        "result": result
+        "result": result,
+        "exercises": exercises,
+        "create_form": create_form
     })
+    
+def load_and_extract_features_from_array(y, sr):
+    pitches, voiced_flag = extract_pitch(y, sr)
+    energy = extract_energy(y)
+    tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+    advanced = extract_advanced_features(y, sr)
+    return {
+        'y': y,
+        'sr': sr,
+        'pitches': pitches,
+        'voiced_flag': voiced_flag,
+        'energy': energy,
+        'tempo': tempo,
+        'mfccs': advanced['mfccs'],
+        'chroma': advanced['chroma'],
+        'contrast': advanced['contrast'],
+        'tonnetz': advanced['tonnetz']
+    }
 
 def ajax_upload_reference_audio(request):
     if request.method == 'POST' and request.FILES.get('reference_audio'):
@@ -178,3 +201,16 @@ def ajax_upload_reference_audio(request):
                 dest.write(chunk)
         return JsonResponse({'success': True, 'filename': ref_file.name})
     return JsonResponse({'success': False}, status=400)
+
+def exercise_create(request):
+    if request.method == 'POST':
+        form = ExerciseCreateForm(request.POST)
+        if form.is_valid():
+            ex = form.save(commit=False)
+            user = request.user
+            ex.user = user
+            ex.save()
+            messages.success(request, "تمرین با موفقیت ایجاد شد.")
+        else:
+            messages.error(request, "لطفاً عنوان تمرین را وارد کنید.")
+    return redirect('exercise')

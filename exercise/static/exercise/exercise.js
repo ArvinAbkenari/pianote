@@ -48,65 +48,106 @@ function setupAudioHandlers() {
     });
 
     // Reference upload
-    const referenceInput = document.getElementById('id_reference_audio');
-    const referenceUploadCard = document.getElementById('referenceUploadCard');
-    const referenceFileName = document.getElementById('referenceFileName');
-    referenceInput.addEventListener('click', function(e) {
+    // const referenceInput = document.getElementById('id_reference_audio');
+    // const referenceUploadCard = document.getElementById('referenceUploadCard');
+    // const referenceFileName = document.getElementById('referenceFileName');
+    // referenceInput.addEventListener('click', function(e) {
+    //     e.stopPropagation();
+    // });
+    // referenceUploadCard.onclick = function() {
+    //     referenceInput.value = null;
+    //     referenceInput.click();
+    // };
+    // referenceInput.addEventListener('change', function(e) {
+    //     if (e.target.files.length > 0) {
+    //         // AJAX upload
+    //         const file = e.target.files[0];
+
+    //         const formData = new FormData();
+    //         formData.append('reference_audio', file);
+    //         fetch('/exercise/ajax/upload_reference/', {
+    //             method: 'POST',
+    //             headers: { 'X-CSRFToken': getCSRFToken() },
+    //             body: formData
+    //         })
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 // Create new song card
+    //                 const songLibrary = document.querySelector('.song-library');
+    //                 const card = document.createElement('div');
+    //                 card.className = 'song-card';
+    //                 card.setAttribute('data-ref', data.filename);
+    //                 card.innerHTML = `
+    //                     <div class="song-info">
+    //                         <h3>${data.filename.length > 15 ? data.filename.slice(0, 15) + '...' : data.filename}</h3>
+    //                         <p>فایل مرجع</p>
+    //                     </div>
+    //                     <button type="button" class="select-btn">انتخاب</button>
+    //                 `;
+    //                 songLibrary.insertBefore(card, document.getElementById('referenceUploadCard'));
+    //                 // Add event listener for selection
+    //                 card.querySelector('.select-btn').addEventListener('click', function(e) {
+    //                     e.preventDefault();
+    //                     document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected-song'));
+    //                     card.classList.add('selected-song');
+    //                     document.getElementById('selectedReferenceInput').value = data.filename;
+    //                     const referenceAudioPlayer = document.getElementById('referenceAudioPlayer');
+    //                     if (referenceAudioPlayer) {
+    //                         referenceAudioPlayer.src = `/media/reference_audio/${data.filename}`;
+    //                         referenceAudioPlayer.load();
+    //                     }
+    //                 });
+    //             } else {
+    //                 referenceFileName.textContent = 'خطا در بارگذاری';
+    //             }
+    //         })
+    //         .catch(() => {
+    //             referenceFileName.textContent = 'خطا در بارگذاری';
+    //         });
+    //     } else {
+    //         referenceFileName.textContent = '';
+    //     }
+    // });
+
+    const uploadBoxref = document.getElementById('refUpload');
+    const fileInputref = document.getElementById('id_reference_audio');
+    const userFileNameref = document.getElementById('referenceFileName');
+
+    // Prevent default click event on file input
+    fileInputref.addEventListener('click', function(e) {
         e.stopPropagation();
     });
-    referenceUploadCard.onclick = function() {
-        referenceInput.value = null;
-        referenceInput.click();
-    };
-    referenceInput.addEventListener('change', function(e) {
-        if (e.target.files.length > 0) {
-            // AJAX upload
-            const file = e.target.files[0];
 
-            const formData = new FormData();
-            formData.append('reference_audio', file);
-            fetch('/exercise/ajax/upload_reference/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCSRFToken() },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Create new song card
-                    const songLibrary = document.querySelector('.song-library');
-                    const card = document.createElement('div');
-                    card.className = 'song-card';
-                    card.setAttribute('data-ref', data.filename);
-                    card.innerHTML = `
-                        <div class="song-info">
-                            <h3>${data.filename.length > 15 ? data.filename.slice(0, 15) + '...' : data.filename}</h3>
-                            <p>فایل مرجع</p>
-                        </div>
-                        <button type="button" class="select-btn">انتخاب</button>
-                    `;
-                    songLibrary.insertBefore(card, document.getElementById('referenceUploadCard'));
-                    // Add event listener for selection
-                    card.querySelector('.select-btn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected-song'));
-                        card.classList.add('selected-song');
-                        document.getElementById('selectedReferenceInput').value = data.filename;
-                        const referenceAudioPlayer = document.getElementById('referenceAudioPlayer');
-                        if (referenceAudioPlayer) {
-                            referenceAudioPlayer.src = `/media/reference_audio/${data.filename}`;
-                            referenceAudioPlayer.load();
-                        }
-                    });
-                } else {
-                    referenceFileName.textContent = 'خطا در بارگذاری';
-                }
-            })
-            .catch(() => {
-                referenceFileName.textContent = 'خطا در بارگذاری';
-            });
+    // Remove the onclick attribute from uploadBox to prevent double dialog
+    uploadBoxref.onclick = null;
+
+    uploadBoxref.addEventListener('click', function(e) {
+        fileInputref.value = null; // Reset so same file can be re-uploaded
+        fileInputref.click();
+    });
+    uploadBoxref.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadBoxref.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+    });
+    uploadBoxref.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadBoxref.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--input-border').trim();
+    });
+    uploadBoxref.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('audio/')) {
+            fileInputref.files = files;
+            fileInputref.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+    fileInputref.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            userFileNameref.textContent = e.target.files[0].name;
+            handleAudioFileref(e.target.files[0]);
         } else {
-            referenceFileName.textContent = '';
+            userFileNameref.textContent = '';
         }
     });
 }
@@ -146,7 +187,15 @@ function handleAudioFile(file) {
         userAudioPlayer.load();
     }
 
-    // TODO: Add audio processing and visualization logic
+}
+
+function handleAudioFileref(file) {
+    const fileURL = URL.createObjectURL(file);
+    const refAudioPlayer = document.getElementById('refAudioPlayer');
+    if (refAudioPlayer) {
+        refAudioPlayer.src = fileURL;
+        refAudioPlayer.load();
+    }
 }
 
 // Helper to get CSRF token from cookie

@@ -1,47 +1,54 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}تمرین - پیانوت{% endblock %}
+
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'exercise/exercise.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{% static 'exercise/exercise.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container dashboard-content ">
-    <h1 class=" exercise_title mb-4">داشبورد تمرین</h1>
+<div class="dashboard-container dashboard-content">
+    <h1 class="exercise_title mb-4">داشبورد تمرین</h1>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
         <section class="song-selection-section">
-            <h2>قطعه خود را انتخاب کنید</h2>
+            <h2>تمرین خود را انتخاب کنید</h2>
             <div class="song-library">
-                {% for ref in reference_files %}
-                <div class="song-card" data-ref="{{ ref }}">
+                {% for exercise in exercises %}
+                <div class="song-card">
                     <div class="song-info">
-                        <h3>
-                          {% if ref|length > 15 %}
-                            {{ ref|slice:":15" }}...
-                          {% else %}
-                            {{ ref }}
-                          {% endif %}
-                        </h3>
-                        <p>فایل مرجع</p>
+                        <h3>{{ exercise.title }}</h3>
+                        <p>تمرین انتخابی</p>
                     </div>
                     <button type="button" class="select-btn">انتخاب</button>
                 </div>
                 {% endfor %}
-                <div class="upload-card" id="referenceUploadCard">
+                <div class="upload-card" id="referenceUploadCard" style="cursor:pointer;">
                     <i class="bi bi-plus-circle-dotted"></i>
-                    <p>بارگذاری قطعه جدید</p>
-                    {{ audio_form.reference_audio }}
+                    <p>ثبت تمرین جدید</p>
                 </div>
             </div>
-            <input type="hidden" name="selected_reference" id="selectedReferenceInput">
         </section>
 
+        <!-- Practice Section -->
         <section class="practice-section">
-            <h2>تمرین شما</h2>
-            <div class="upload-container">
-                <div class="upload-box" id="practiceUpload">
+            <h2>فایل های شما</h2>
+            <div class="upload-container" style="display:flex;gap:20px;flex-wrap:wrap;">
+                
+                <!-- Reference Upload -->
+                <div class="upload-box" id="refUpload" style="flex:1;position:relative;">
+                    <i class="bi bi-mic-fill"></i>
+                    <p>بارگذاری قطعه مرجع</p>
+                    <span>یا فایل صوتی را بکشید و رها کنید</span>
+                    {{ audio_form.reference_audio }}
+                    <div class="uploaded-filename" id="referenceFileName"></div>
+                </div>
+
+                <!-- User Upload -->
+                <div class="upload-box" id="practiceUpload" style="flex:1;position:relative;">
                     <i class="bi bi-mic-fill"></i>
                     <p>بارگذاری ضبط تمرین شما</p>
                     <span>یا فایل صوتی را بکشید و رها کنید</span>
@@ -54,12 +61,11 @@
                 <div class="waveform-comparison">
                     <div class="waveform original">
                         <h4>اصلی</h4>
-
-                        <audio id="referenceAudioPlayer" controls style="width:100%;margin-top:10px;">
-                          {% if selected_reference %}
-                            <source src="{{ MEDIA_URL }}reference_audio/{{ selected_reference }}" type="audio/mpeg">
-                          {% endif %}
-                          Your browser does not support the audio element.
+                        <audio id="refAudioPlayer" controls style="width:100%;margin-top:10px;">
+                            {% if selected_reference %}
+                                <source src="{{ MEDIA_URL }}reference_audio/{{ selected_reference }}" type="audio/mpeg">
+                            {% endif %}
+                            مرورگر شما از این عنصر پشتیبانی نمی‌کند.
                         </audio>
                     </div>
                     <div class="waveform practice">
@@ -69,8 +75,10 @@
                 </div>
             </div>
         </section>
-                <button type="submit" class="btn btn-primary mb-5 w-100 p-3"style="font-size: 20px;" >تحلیل کن</button>
 
+        <button type="submit" class="btn btn-primary mb-5 w-100 p-3" style="font-size: 20px;">تحلیل کن</button>
+
+        <!-- Performance Metrics -->
         <section class="performance-metrics">
             <h2>تحلیل عملکرد</h2>
             <div class="metrics-grid">
@@ -106,19 +114,65 @@
                 </div>
             </div>
         </section>
+
         {% if result.error %}
-            <div class="error-message">
-                <i class="bi bi-exclamation-triangle"></i>
-                <span>خطا: {{ result.error }}</span>
-            </div>
+        <div class="error-message">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>خطا: {{ result.error }}</span>
+        </div>
         {% endif %}
     </form>
 </div>
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" id="modalBackdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1040;"></div>
+
+    <!-- Modal -->
+    <div class="modal-custom" id="exerciseModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1050;min-width:320px;max-width:90vw;padding:2rem;">
+        <span class="modal-close" id="modalClose" style="position:absolute;top:1rem;left:1rem;font-size:1.5rem;cursor:pointer;color:#888;">&times;</span>
+        <h2 class="mb-3">ایجاد تمرین جدید</h2>
+        <form method="post" action="{% url 'exercise_create' %}">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                {{ create_form.title.label_tag }}
+                {{ create_form.title }}
+                {{ create_form.title.errors }}
+            </div>
+            <button type="submit" class="btn btn-success w-100">ایجاد تمرین</button>
+        </form>
+    </div>
+
 {% endblock %}
+
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{% static "exercise/exercise.js"%}"></script>
+<script src="{% static 'exercise/exercise.js' %}"></script>
 {% if result %}
   {{ result|json_script:"chartjsResultData" }}
 {% endif %}
+
+<script>
+    const referenceUploadCard = document.getElementById('referenceUploadCard');
+    const modal = document.getElementById('exerciseModal');
+    const backdrop = document.getElementById('modalBackdrop');
+    const closeBtn = document.getElementById('modalClose');
+
+    if(referenceUploadCard && modal && backdrop && closeBtn) {
+        referenceUploadCard.onclick = function() {
+            modal.style.display = 'block';
+            backdrop.style.display = 'block';
+            setTimeout(() => {
+                const input = modal.querySelector('input[name="title"]');
+                if(input) input.focus();
+            }, 100);
+        };
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+            backdrop.style.display = 'none';
+        };
+        backdrop.onclick = function() {
+            modal.style.display = 'none';
+            backdrop.style.display = 'none';
+        };
+    }
+</script>
 {% endblock %}

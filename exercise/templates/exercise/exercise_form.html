@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="auth-wrapper">
+    <form method="post" action="{% url 'exercise_create' %}" id="exerciseForm" class="auth-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        {{ form.title }}
+        <i class="bi bi-music-note"></i>
+        <div class="error-text text-danger">
+          {% for error in form.title.errors %}{{ error }}{% endfor %}
+        </div>
+      </div>
+
+      <div class="error-text text-danger" id="form-error">
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        {% endif %}
+      </div>
+
+      <button type="submit" class="auth-btn">ایجاد تمرین</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

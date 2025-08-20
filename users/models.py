@@ -16,8 +16,8 @@ class User(models.Model):
     isSuperUser = models.BooleanField(default=False)
     deleteFlag = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.username
+    # def __str__(self):
+    #     return self.username
 
 @property
 def is_authenticated(self):
