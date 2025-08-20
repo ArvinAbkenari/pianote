@@ -3,7 +3,7 @@
     --border-radius: 12px;
     --chart-height: 200px;
     --grid-gap: 1.5rem;
-    --upload-box-height: 200px;
+
 }
 
 .dashboard-container {
@@ -91,6 +91,7 @@
     justify-content: center;
     cursor: pointer;
     color: var(--text-secondary);
+
 }
 
 .upload-card i {
@@ -107,7 +108,7 @@
 }
 
 .upload-box {
-    height: var(--upload-box-height);
+
     border: 2px dashed var(--input-border);
     border-radius: var(--border-radius);
     display: flex;
@@ -117,6 +118,7 @@
     cursor: pointer;
     transition: border-color 0.3s ease, background-color 0.3s ease;
     background: var(--bg-secondary);
+    padding: 10px;
 }
 
 .upload-box:hover {
@@ -125,9 +127,8 @@
 }
 
 .upload-box i {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--accent-color);
-    margin-bottom: 0.75rem;
 }
 
 .upload-box p {
@@ -189,27 +190,48 @@
 
 /* Performance Metrics */
 .performance-metrics {
-    margin-top: 3rem;
+    margin-top: 2rem; /* slightly reduced top margin for compactness */
+    margin-bottom: 2rem;
 }
 
+.row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+    flex-wrap: nowrap;
+}
+
+.col {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* Metrics layout: use flexbox so all metric cards sit in a single row on wide screens */
 .metrics-grid {
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    gap: 1.6rem;
+    align-items: stretch;
+    flex-wrap: nowrap; /* keep all metrics on one row unless viewport is small */
 }
 
 .metric-cards-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    display: flex;
+    gap: 1.6rem;
+    flex: 1 1 0;
+    align-items: stretch;
 }
 
 .metric-card {
     background: var(--card-bg);
-    padding: 2rem;
-    border-radius: var(--border-radius);
+    padding: 0.75rem; /* reduced padding for compactness */
+    border-radius: calc(var(--border-radius) - 4px);
     box-shadow: var(--card-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex: .5;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .metric-card:hover {
@@ -232,7 +254,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: .5rem;
 }
 
 .metric-header i {
@@ -247,17 +269,18 @@
 .metric-card h3 {
     margin: 0;
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-size: .9rem;
     font-weight: 500;
 }
 
 .score {
-    font-size: 2.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-primary);
     display: flex;
     align-items: baseline;
     gap: 0.25rem;
+    padding-right: 10px;
 }
 
 .percentage {
@@ -283,7 +306,8 @@
 
 @media (max-width: 768px) {
     .metric-cards-container {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        gap: var(--grid-gap);
     }
 }
 
@@ -371,13 +395,16 @@
     }
 
     .metrics-grid {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        gap: var(--grid-gap);
+        flex-wrap: wrap;
     }
 }
 
 @media (max-width: 900px) {
     .metrics-grid {
         gap: var(--grid-gap);
+        flex-wrap: wrap;
     }
     .metric-card {
         max-width: 100%;
@@ -400,4 +427,41 @@ input[type="file"] {
     height: 0.1px;
     position: absolute;
     z-index: -1;
+}
+
+/* Chart Card Styling */
+.metrics-chart-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--card-shadow);
+    margin-top: 1rem;
+    color: var(--text-primary);
+    direction: rtl; /* ensure Persian labels render RTL */
+    font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+}
+
+.metrics-chart-card canvas {
+    width: 100% !important;
+    height: 320px !important;
+}
+
+/* Chart legend and tooltip polish for dark mode */
+[data-theme="dark"] .metrics-chart-card {
+    background: var(--card-bg);
+    box-shadow: var(--card-hover-shadow);
+    color: var(--text-primary);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .metrics-chart-card canvas {
+        height: 260px !important;
+    }
+}
+
+/* Small utility for percent axis tick */
+.chart-percent-tick {
+    font-size: 12px;
+    color: var(--text-secondary);
 }

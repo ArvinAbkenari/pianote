@@ -246,30 +246,194 @@ function setupSongSelection() {
 
 // Global chart helpers — used both for AJAX metrics and server-returned single result
 let globalMetricsChart = null;
+function hexToRgba(hex, alpha) {
+    if (!hex) return `rgba(0,0,0,${alpha})`;
+    const clean = hex.replace('#', '').trim();
+    const bigint = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getCSSVar(name, fallback) {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return (v && v.trim()) || fallback;
+}
+
+function isDarkMode() {
+    const t = document.documentElement.getAttribute('data-theme');
+    return t === 'dark';
+}
+
 function ensureGlobalChart() {
     const canvas = document.getElementById('metricsChart');
     if (!canvas) return null;
     const ctx = canvas.getContext('2d');
     if (globalMetricsChart) return globalMetricsChart;
+
+    const textColor = getCSSVar('--text-primary', '#2D3436');
+    const subText = getCSSVar('--text-secondary', '#4A5568');
+    const cardBg = getCSSVar('--card-bg', '#FFFFFF');
+    const accent = getCSSVar('--accent-color', '#3182CE');
+
     globalMetricsChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [],
             datasets: [
-                { label: 'pitch_score', data: [], borderColor: '#3182CE', backgroundColor: 'rgba(49,130,206,0.08)', tension: 0.3 },
-                { label: 'tempo_score', data: [], borderColor: '#38A169', backgroundColor: 'rgba(56,161,105,0.08)', tension: 0.3 },
-                { label: 'energy_score', data: [], borderColor: '#E53E3E', backgroundColor: 'rgba(229,62,62,0.08)', tension: 0.3 },
-                { label: 'final_score', data: [], borderColor: '#805AD5', backgroundColor: 'rgba(128,90,213,0.08)', tension: 0.3 }
+                { label: 'دقت نت‌ها', data: [], borderColor: accent, backgroundColor: hexToRgba(accent, 0.08), tension: 0.3, pointRadius: 3, pointHoverRadius: 6, fill: true },
+                { label: 'دقت زمان‌بندی', data: [], borderColor: '#38A169', backgroundColor: hexToRgba('#38A169', 0.08), tension: 0.3, pointRadius: 3, pointHoverRadius: 6, fill: true },
+                { label: 'دقت صدا', data: [], borderColor: '#E53E3E', backgroundColor: hexToRgba('#E53E3E', 0.08), tension: 0.3, pointRadius: 3, pointHoverRadius: 6, fill: true },
+                { label: 'امتیاز نهایی', data: [], borderColor: '#805AD5', backgroundColor: hexToRgba('#805AD5', 0.08), tension: 0.3, pointRadius: 3, pointHoverRadius: 6, fill: true }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { position: 'top' } },
-            scales: { x: { display: true, title: { display: true, text: 'زمان' } }, y: { beginAtZero: true, max: 100 } }
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: { family: 'Vazirmatn, system-ui, -apple-system, sans-serif', size: 13 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode() ? '#0f1724' : '#fff',
+                    titleColor: textColor,
+                    bodyColor: getCSSVar('--text-primary', '#2D3436'),
+                    borderColor: hexToRgba(subText, 0.12),
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function (ctx) {
+                            const v = Number(ctx.parsed.y || 0).toFixed(1);
+                            return `${ctx.dataset.label}: ${v}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: { display: true, text: 'زمان', color: textColor, font: { family: 'Vazirmatn', size: 12 } },
+                    ticks: { color: subText, font: { family: 'Vazirmatn' } },
+                    grid: { color: hexToRgba(subText, 0.06) }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        color: subText,
+                        font: { family: 'Vazirmatn' },
+                        callback: function (v) { return v + '%'; }
+                    },
+                    grid: { color: hexToRgba(subText, 0.04) }
+                }
+            }
         }
     });
+
+    // style container card (metricsArea is canvas parent)
+    try {
+        const parent = canvas.parentElement;
+        if (parent) {
+            parent.style.background = cardBg;
+            parent.style.padding = '1rem';
+            parent.style.borderRadius = '12px';
+            parent.style.boxShadow = getCSSVar('--card-shadow', '0 8px 24px rgba(0,0,0,0.08)');
+        }
+    } catch (e) {
+        // ignore styling errors
+    }
+
     return globalMetricsChart;
+}
+
+// Apply current theme colors to an existing chart (called on theme toggle)
+function applyThemeToChart(chart) {
+    const ch = chart || globalMetricsChart;
+    if (!ch) return;
+
+    const textColor = getCSSVar('--text-primary', '#2D3436');
+    const subText = getCSSVar('--text-secondary', '#4A5568');
+    const accent = getCSSVar('--accent-color', '#3182CE');
+    const cardBg = getCSSVar('--card-bg', '#FFFFFF');
+
+    // Map dataset colors (keep same logical ordering)
+    const colors = [accent, '#38A169', '#E53E3E', '#805AD5'];
+
+    ch.data.datasets.forEach((ds, idx) => {
+        const hex = colors[idx] || accent;
+        ds.borderColor = hex;
+        ds.backgroundColor = hexToRgba(hex, 0.08);
+        ds.pointBackgroundColor = hexToRgba(hex, 1);
+    });
+
+    // Update axis/legend/tooltip colors
+    if (!ch.options) ch.options = {};
+    if (!ch.options.plugins) ch.options.plugins = {};
+
+    if (ch.options.plugins.legend && ch.options.plugins.legend.labels) {
+        ch.options.plugins.legend.labels.color = textColor;
+        ch.options.plugins.legend.labels.font = { family: 'Vazirmatn, system-ui, -apple-system, sans-serif', size: 13 };
+    }
+
+    if (ch.options.plugins.tooltip) {
+        ch.options.plugins.tooltip.backgroundColor = isDarkMode() ? '#0f1724' : '#ffffff';
+        ch.options.plugins.tooltip.titleColor = textColor;
+        ch.options.plugins.tooltip.bodyColor = getCSSVar('--text-primary', '#2D3436');
+        ch.options.plugins.tooltip.borderColor = hexToRgba(subText, 0.12);
+    }
+
+    if (ch.options.scales) {
+        if (ch.options.scales.x) {
+            if (!ch.options.scales.x.ticks) ch.options.scales.x.ticks = {};
+            ch.options.scales.x.ticks.color = subText;
+            if (!ch.options.scales.x.title) ch.options.scales.x.title = {};
+            ch.options.scales.x.title.color = textColor;
+        }
+        if (ch.options.scales.y) {
+            if (!ch.options.scales.y.ticks) ch.options.scales.y.ticks = {};
+            ch.options.scales.y.ticks.color = subText;
+        }
+        // grid colors
+        if (ch.options.scales.x.grid) ch.options.scales.x.grid.color = hexToRgba(subText, 0.06);
+        if (ch.options.scales.y.grid) ch.options.scales.y.grid.color = hexToRgba(subText, 0.04);
+    }
+
+    // style parent container to match current theme
+    try {
+        const canvas = document.getElementById('metricsChart');
+        if (canvas && canvas.parentElement) {
+            const parent = canvas.parentElement;
+            parent.style.background = cardBg;
+            parent.style.boxShadow = getCSSVar('--card-shadow', '0 8px 24px rgba(0,0,0,0.08)');
+            parent.style.color = textColor;
+        }
+    } catch (e) {
+        // ignore
+    }
+
+    ch.update();
+}
+
+// Observe theme toggles on <html data-theme="..."> and update chart live
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            if (m.type === 'attributes' && m.attributeName === 'data-theme') {
+                // delay slightly to allow CSS var transition
+                setTimeout(() => applyThemeToChart(), 80);
+            }
+        }
+    });
+    try {
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    } catch (e) {
+        // ignore if observe not allowed
+    }
 }
 
 function updateGlobalChart(labels, pitch, tempo, energy, finalS) {
@@ -300,7 +464,7 @@ function handleServerResult() {
     const metricsArea = document.getElementById('metricsArea');
     if (metricsArea) metricsArea.style.display = '';
     // create single-point chart from result
-    const label = result.createdAt ? new Date(result.createdAt).toLocaleString() : new Date().toLocaleString();
+    const label = result.createdAt ? new Date(result.createdAt).toLocaleString('fa-IR') : new Date().toLocaleString('fa-IR');
     const labels = [label];
     const pitch = [Number(result.pitch_score) || Number(result.pitch) || 0];
     const tempo = [Number(result.tempo_score) || Number(result.tempo) || 0];
