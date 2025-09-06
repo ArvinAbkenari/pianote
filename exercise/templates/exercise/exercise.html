@@ -22,10 +22,12 @@
                 <div class="song-card" data-exercise-id="{{ exercise.id }}">
 
                     <div class="song-info">
-                        <h3>{{ exercise.title }}</h3>
-                    <button type="button" class="delete-btn" data-exercise-id="{{ exercise.id }}" style="background:none;border:none;cursor:pointer;margin-right:8px;">
-                        <i class="bi bi-trash" style="color:red;font-size:1em;"></i>
-                    </button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3>{{ exercise.title }}</h3>
+                            <button type="button" class="delete-btn" data-exercise-id="{{ exercise.id }}" style="background:none;border:none;cursor:pointer;">
+                                <i class="bi bi-x-lg" style="color:red;font-size:1.5em;"></i>
+                            </button>
+                        </div>
                         <p>{{ exercise.metrics|length }} رکورد</p>
                     </div>
                     <button type="button" class="select-btn">انتخاب</button>

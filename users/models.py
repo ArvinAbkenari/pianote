@@ -8,7 +8,7 @@ class User(models.Model):
     id = models.CharField(max_length=24, primary_key=True, editable=False)
     fullName = models.CharField(max_length=150)
     password = models.CharField(max_length=128)
-    rePassword = models.CharField(max_length=128)
+    
     email = models.EmailField()
     phoneNumber = models.CharField(max_length=20)
     premiumDate = models.DateTimeField()

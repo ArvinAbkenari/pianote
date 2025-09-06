@@ -137,7 +137,7 @@
 .form-group input {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 1rem;
-    background: var(--input-bg);
+    background: white;
     border: 1px solid var(--input-border);
     border-radius: 10px;
     color: var(--text-primary);

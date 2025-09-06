@@ -104,7 +104,8 @@
         $('#brand').select2({
             width: '100%',
             selectionCssClass: 'form-select d-flex align-items-center px-0',
-
+            dropdownParent: $('#brand').parent(),
+            theme: 'bootstrap-5',
             matcher: function(params, data) {
                 if ($.trim(params.term) === '') return data;
                 if (typeof data.text === 'undefined') return null;
@@ -115,7 +116,8 @@
         $('#model').select2({
             width: '100%',
             selectionCssClass: 'form-select d-flex align-items-center px-0',
-
+            dropdownParent: $('#model').parent(),
+            theme: 'bootstrap-5',
             matcher: function(params, data) {
                 if ($.trim(params.term) === '') return data;
                 if (typeof data.text === 'undefined') return null;
@@ -126,7 +128,32 @@
         $('#material').select2({
             width: '100%',
             selectionCssClass: 'form-select d-flex align-items-center px-0',
-
+            dropdownParent: $('#material').parent(),
+            theme: 'bootstrap-5',
+            matcher: function(params, data) {
+                if ($.trim(params.term) === '') return data;
+                if (typeof data.text === 'undefined') return null;
+                if (data.text.toLowerCase().includes(params.term.toLowerCase())) return data;
+                return null;
+            }
+        });
+        $('#finish').select2({
+            width: '100%',
+            selectionCssClass: 'form-select d-flex align-items-center px-0',
+            dropdownParent: $('#finish').parent(),
+            theme: 'bootstrap-5',
+            matcher: function(params, data) {
+                if ($.trim(params.term) === '') return data;
+                if (typeof data.text === 'undefined') return null;
+                if (data.text.toLowerCase().includes(params.term.toLowerCase())) return data;
+                return null;
+            }
+        });
+        $('#types').select2({
+            width: '100%',
+            selectionCssClass: 'form-select d-flex align-items-center px-0',
+            dropdownParent: $('#types').parent(),
+            theme: 'bootstrap-5',
             matcher: function(params, data) {
                 if ($.trim(params.term) === '') return data;
                 if (typeof data.text === 'undefined') return null;

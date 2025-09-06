@@ -16,7 +16,7 @@ class UserSignupForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['password', 'rePassword', 'email', 'fullName', 'phoneNumber']
+        fields = ['password', 'email', 'fullName', 'phoneNumber']
         widgets = {
             'password': forms.PasswordInput(attrs={
                 'placeholder': 'رمز عبور', 'class': 'form-control', 'required': True
