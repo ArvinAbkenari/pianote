@@ -106,6 +106,10 @@ body {
     background: rgba(26, 32, 44, 0.7); /* Adjusted for dark mode */
 }
 
+[data-theme="dark"] .navbar-toggler-icon {
+    filter: invert(1);
+}
+
 .theme-toggle,
 .profile-icon {
     background: none;
@@ -943,25 +947,148 @@ textarea:focus {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .hero-title {
+        font-size: 6rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-section {
+        padding: 6rem 0;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        max-width: 100%;
+    }
+
+    .hero-image-container {
+        margin-top: 3rem;
+    }
+
+    .progress-section {
+        padding: 6rem 0;
+        text-align: center;
+    }
+
+    .progress-section .row {
+        padding: 2rem;
+    }
+
+    .progress-section h2 {
         font-size: 2.5rem;
     }
+
+    .progress-section p {
+        font-size: 1.1rem;
+    }
+
+    .stats-testimonials-section {
+        padding: 4rem 0;
+    }
+
+    .stat-card, .testimonial-card {
+        margin-bottom: 2rem;
+    }
+
+    .faq-section {
+        padding: 6rem 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
     
+    .profile-div{
+        padding-left:15px !important;
+        padding-right:15px !important;
+    
+    }
+
+    .hero-section {
+        padding: 4rem 0;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+    }
+
     .hero-description {
         font-size: 1rem;
     }
-    
+
     .progress-section h2 {
         font-size: 2rem;
     }
-    
+
+    .counter {
+        font-size: 2.5rem;
+    }
+
+    .faq-section h2 {
+        font-size: 2rem;
+    }
+
+    .faq-section .accordion-button {
+        font-size: 1rem;
+        padding: 1.25rem 1.5rem;
+    }
+    .hero-section::before {
+        display: none;
+    }
+    .hero-image-container{
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+
+    .hero-description {
+        font-size: 0.9rem;
+    }
+
+    .progress-section {
+        padding: 4rem 0;
+    }
+
+    .progress-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .progress-section p {
+        font-size: 1rem;
+    }
+
+    .progress-section .btn-primary {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .stat-card {
+        padding: 2rem;
+    }
+
     .counter {
         font-size: 2rem;
     }
 
-    .stats-section .col-md-6 {
-        flex: 1 1 100%;
-        max-width: 100%;
+    .testimonial-card {
+        padding: 1.5rem;
+    }
+
+    .faq-section {
+        padding: 4rem 0;
     }
 }
