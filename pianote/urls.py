@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from users import views
 from notes import views as notes_view
 from estimator import views as estimator_view
@@ -41,6 +41,7 @@ urlpatterns = [
     path("exercise/ajax/metrics/<str:exercise_id>/", exercise_view.ajax_exercise_metrics, name="ajax_exercise_metrics"),
     path("price-estimator/", estimator_view.estimator_view, name="estimator"),
     path("exercises/create/", exercise_view.exercise_create, name="exercise_create"),
-    ]
+    path("exercise/", include("exercise.urls")), # <-- add this line
+]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

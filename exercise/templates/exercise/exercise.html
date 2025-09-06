@@ -20,8 +20,12 @@
             <div class="song-library">
                 {% for exercise in exercises %}
                 <div class="song-card" data-exercise-id="{{ exercise.id }}">
+
                     <div class="song-info">
                         <h3>{{ exercise.title }}</h3>
+                    <button type="button" class="delete-btn" data-exercise-id="{{ exercise.id }}" style="background:none;border:none;cursor:pointer;margin-right:8px;">
+                        <i class="bi bi-trash" style="color:red;font-size:1em;"></i>
+                    </button>
                         <p>{{ exercise.metrics|length }} رکورد</p>
                     </div>
                     <button type="button" class="select-btn">انتخاب</button>
@@ -183,5 +187,33 @@
         closeBtn.onclick = hideModal;
         backdrop.onclick = hideModal;
     }
+
+    // Delete practice AJAX
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const exId = btn.getAttribute('data-exercise-id');
+            if(confirm('آیا مطمئن هستید که می‌خواهید این تمرین را حذف کنید؟')) {
+                fetch(`/exercise/delete/${exId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        btn.closest('.song-card').remove();
+                    } else {
+                        alert('خطا در حذف تمرین');
+                    }
+                })
+                .catch(() => alert('خطا در ارتباط با سرور'));
+            }
+        });
+    });
 </script>
 {% endblock %}

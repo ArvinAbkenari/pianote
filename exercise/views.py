@@ -15,6 +15,8 @@ from .models import User
 import secrets
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 REFERENCE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'notes', 'media', 'reference_audio')
 os.makedirs(REFERENCE_DIR, exist_ok=True)
@@ -266,3 +268,16 @@ def exercise_create(request):
         else:
             messages.error(request, "لطفاً عنوان تمرین را وارد کنید.")
     return redirect('exercise')
+
+@session_login_required
+@csrf_exempt
+def exercise_delete(request, exercise_id):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=400)
+    try:
+        ex = Exercise.objects.get(id=exercise_id, user_id=request.user, deleteFlag=False)
+        ex.deleteFlag = True
+        ex.save()
+        return JsonResponse({'success': True})
+    except Exercise.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'not found'}, status=404)
