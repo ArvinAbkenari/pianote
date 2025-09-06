@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load number_filters %}
 {% load static %}
 {% block title %}تخمین قیمت پیانو - پیانوت{% endblock %}
 {% block extra_css %}
@@ -71,7 +72,7 @@
                         </form>
                         {% if prediction %}
                         <div id="result" class="mt-4 text-center">
-                            <h4>قیمت تخمینی: <span class="fs-2 fw-bold text-success">{{ prediction }} تومان</span></h4>
+                            <h4>قیمت تخمینی: <span class="fs-2 fw-bold text-success">{{ prediction|three_comma|to_persian_digits}} تومان </span></h4>
                         </div>
                         {% endif %}
                     </div>

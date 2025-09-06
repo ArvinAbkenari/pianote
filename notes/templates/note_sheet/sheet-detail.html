@@ -162,7 +162,7 @@
                 تعداد صفحات: {% if pdf_page_count %}{{ pdf_page_count|to_persian_digits }}{% else %}نامشخص{% endif %}
               </p>
             </div>
-            <a href="{% static 'images/sheet.pdf' %}" class="btn btn-primary w-100" download>
+            <a href='{{note.notesheet.url}}' class="btn btn-primary w-100" download>
               <i class="bi bi-download me-2"></i>
               دانلود نُت
             </a>

@@ -19,6 +19,7 @@ finish_binarizer = pipeline["finish_binarizer"]
 # Create your views here.
 @session_login_required
 def estimator_view(request):
+    dollar_price = 95000
     signup_form = UserSignupForm()
     prediction = None
     df = pd.read_csv("data.csv")
@@ -68,7 +69,7 @@ def estimator_view(request):
             "type_vertical" : type_vertical
         }])
         processed = preprocess_input(input_df)
-        prediction = model.predict(processed)[0]
+        prediction = int(model.predict(processed)[0]* dollar_price)
     return render(request, "estimator/estimator.html", {
         "form": signup_form,
         "brands": brands,

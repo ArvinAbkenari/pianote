@@ -59,7 +59,7 @@
                                 <a href="{% url 'note-detail' note.id %}">
 
                                     <div class="sheet-card">
-                                        <img src="{{ note.preview.url }}" alt="نت موسیقی" class="sheet-preview">
+                                        <img src="/media/{{note.preview}}" alt="نت موسیقی" class="sheet-preview">
                                         <div class="sheet-info">
                                             <h3>{{ note.name }}</h3>
                                             <p class="composer">{{note.composer}}</p>
