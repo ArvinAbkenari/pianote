@@ -1,28 +1,51 @@
-# Django MongoDB Backend - Project Template
+# Pianote
 
-This is a Django project starter template for the Django MongoDB Backend.
-In order to use it with your version of Django: 
+A web application for piano students and teachers.
 
-- Find your Django version. To do so from the command line, make sure you
-  have Django installed and run:
+## Features
 
-```bash
-django-admin --version
->> 5.2
-```
+*   **Exercise Generator:** Creates custom piano exercises for users.
+*   **Note Sheet Viewer:** Displays piano note sheets.
+*   **User Authentication:** Secure user login and registration.
+*   **Piano Price Estimator:** Estimates the price of a piano based on its features.
 
-## Create the Django project
+## Technologies Used
 
-From your shell, run the following command to create a new Django project
-replacing the `{{ project_name }}` and `{{ version }}` sections. 
+*   **Backend:** Django, Python
+*   **Frontend:** HTML, CSS, JavaScript
+*   **Database:** MongoDB
 
-```bash
-django-admin startproject {{ project_name }} --template https://github.com/mongodb-labs/django-mongodb-project/archive/refs/heads/{{ version }}.x.zip
-```
+## Installation
 
-For a project named `5_2_example` that runs on `django==5.2.*`
-the command would look like this:
+1.  **Clone the repository:**
 
-```bash
-django-admin startproject 5_2_example --template https://github.com/mongodb-labs/django-mongodb-project/archive/refs/heads/5.2.x.zip
-```
+    ```bash
+    git clone <repository-url>
+    ```
+
+2.  **Navigate to the project directory:**
+
+    ```bash
+    cd pianote
+    ```
+
+3.  **Install the dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Run the development server:**
+
+    ```bash
+    python manage.py runserver
+    ```
+
+## Usage
+
+Once the server is running, you can access the application in your web browser at `http://127.0.0.1:8000/`.
+
+*   Register for a new account or log in with an existing one.
+*   Use the exercise generator to create new piano exercises.
+*   View and practice with the provided note sheets.
+*   Estimate the price of a piano.
