@@ -183,7 +183,7 @@ a{
 .genre {
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
     color: var(--text-secondary);
 }
 .view_count{

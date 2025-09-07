@@ -120,10 +120,7 @@
 }
 
 /* Dark theme adjustments */
-[data-theme="dark"] .contact-form-wrapper,
-[data-theme="dark"] .contact-info-card {
-    background-color: var(--card-bg-dark);
-}
+
 
 [data-theme="dark"] .contact-form .form-control {
     background-color: var(--input-bg-dark);
