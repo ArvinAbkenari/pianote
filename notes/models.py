@@ -1,14 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from bson import ObjectId
 from pdf2image import convert_from_path
-from django.core.files.base import ContentFile
-from io import BytesIO
-from PIL import Image
 import os
 
 User = get_user_model()
-
 
 
 class Note(models.Model):
@@ -21,7 +16,7 @@ class Note(models.Model):
     name = models.CharField(max_length=150)
     genre = models.JSONField()
     composer = models.CharField(max_length=150)
-    description = models.TextField(blank= True, null=True)
+    description = models.TextField(blank=True, null=True)
     level = models.IntegerField(choices=LEVEL_CHOICES)
     rate = models.FloatField()
     likes = models.IntegerField()
@@ -31,9 +26,14 @@ class Note(models.Model):
     deleteFlag = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
     comments = models.JSONField(default=list)
-    notesheet = models.FileField(upload_to='notesheets/', null=True, blank=True)
+    notesheet = models.FileField(
+        upload_to='notesheets/', null=True, blank=True
+    )
     audio = models.FileField(upload_to='audio/', null=True, blank=True)
-    preview = models.ImageField(blank=True, null=True, upload_to='notesheets/previews/')
+    preview = models.ImageField(
+        blank=True, null=True, upload_to='notesheets/previews/'
+    )
+
     def add_comment(self, user_id, text, createdDate, delete_flag=False):
         # Convert datetime to ISO string for JSON serialization
         if hasattr(createdDate, 'isoformat'):
@@ -46,6 +46,7 @@ class Note(models.Model):
         }
         self.comments.append(comment)
         self.save()
+
     def add_like(self, user_id, text, createdDate, delete_flag=False):
         # Convert datetime to ISO string for JSON serialization
         if hasattr(createdDate, 'isoformat'):
@@ -68,10 +69,14 @@ class Note(models.Model):
             }
             self.voters.append(vote)
         # Recalculate rate: likes / total votes (excluding deleted votes)
-        likes = sum(1 for v in self.voters if v.get("shape") == "like" and not v.get("deleteFlag", False))
+        likes = sum(
+            1 for v in self.voters if v.get("shape") == "like" and not
+            v.get("deleteFlag", False)
+        )
         total = sum(1 for v in self.voters if not v.get("deleteFlag", False))
-        self.rate = (likes / total if total > 0 else 0) *5
+        self.rate = (likes / total if total > 0 else 0) * 5
         self.save()
+
     @staticmethod
     def generate_pdf_preview(pdf_path, output_path):
         images = convert_from_path(pdf_path, first_page=1, last_page=1)
@@ -81,7 +86,7 @@ class Note(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         # Check if notesheet is being added or changed
         is_new = self._state.adding or not self.pk
@@ -104,16 +109,18 @@ class Note(models.Model):
             preview_path = os.path.join(preview_dir, preview_filename)
             try:
                 Note.generate_pdf_preview(pdf_path, preview_path)
-                self.preview.name = os.path.join('notesheets', 'previews', preview_filename)
+                self.preview.name = os.path.join(
+                    'notesheets', 'previews', preview_filename
+                )
                 super().save(update_fields=['preview'])
-            except Exception as e:
+            except Exception:
                 # Optionally log the error
                 pass
-        
-    
+
     @property
     def level_value(self):
         return dict(self.LEVEL_CHOICES).get(self.level, "Unknown")
+
 
 @property
 def is_authenticated(self):

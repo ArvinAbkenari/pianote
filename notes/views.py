@@ -4,11 +4,11 @@ from users.forms import UserSignupForm
 from .models import Note
 from django.utils import timezone
 from PyPDF2 import PdfReader
-from django.conf import settings
-from django.db.models import Q, F
 from django.core.paginator import Paginator
 from pymongo import MongoClient
 from users.views import session_login_required
+from django.db.models import Q
+
 
 # Create your views here.
 def notes_view(request):
@@ -24,11 +24,13 @@ def notes_view(request):
                 img_bytes = pix.tobytes("png")
                 import base64
                 note.preview = base64.b64encode(img_bytes).decode('utf-8')
-            except Exception as e:
+            except Exception:
                 note.preview = None
         else:
             note.preview = None
-    return render(request, "notes/sheets.html",{"form": signup_form , "notes": notes})
+    return render(
+        request, "notes/sheets.html", {"form": signup_form, "notes": notes}
+    )
 
 
 def ajax_search(request):
@@ -36,22 +38,23 @@ def ajax_search(request):
     results = []
 
     if query:
-        from django.db.models import Q
         notes = Note.objects.filter(
             Q(name__icontains=query)
         )
-        results = [{"name": note.name, "composer":note.composer, "id":note.id} for note in notes]
+        results = [
+            {"name": note.name, "composer": note.composer, "id": note.id}
+            for note in notes
+        ]
 
     return JsonResponse({"results": results})
-
-
 
 
 def note_detail_view(request, note_id):
     signup_form = UserSignupForm()
     try:
         note = Note.objects.get(id=note_id, deleteFlag=False)
-        # Only increment views if this is a GET request and not a redirect after POST
+        # Only increment views if this is a GET request
+        # and not a redirect after POST
         if request.method == "GET" and not request.GET.get("from_action"):
             note.views += 1
             note.save(update_fields=["views"])
@@ -80,7 +83,7 @@ def note_detail_view(request, note_id):
                 note.add_like(user_id, vote_shape, timezone.now())
         # Redirect with a query param to prevent view increment
         return redirect(f"{request.path}?from_action=1")
-    
+
     # Attach user fullName to each comment
     from users.models import User
     comments = []
@@ -92,7 +95,7 @@ def note_detail_view(request, note_id):
         except User.DoesNotExist:
             comment["fullName"] = "کاربر حذف شده"
         comments.append(comment)
-        
+
     my_vote = None
     if request.session.get("user_id"):
         user_id = str(request.session["user_id"])
@@ -100,8 +103,18 @@ def note_detail_view(request, note_id):
             if str(v.get("userID")) == user_id and not v.get("deleteFlag", False):
                 my_vote = v.get("shape")
                 break
-    return render(request, "note_sheet/sheet-detail.html", {"note": note, "form": signup_form,
-                                                            "comments": comments, "pdf_page_count": pdf_page_count , "my_vote": my_vote,})
+    return render(
+        request,
+        "note_sheet/sheet-detail.html",
+        {
+            "note": note,
+            "form": signup_form,
+            "comments": comments,
+            "pdf_page_count": pdf_page_count,
+            "my_vote": my_vote,
+        }
+    )
+
 
 @session_login_required
 def notes_list(request):

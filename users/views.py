@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from users.models import User
 from .forms import UserSignupForm
 from .forms import UserSigninForm
 from functools import wraps
+from notes.models import Note
+from .models import User
 
 
 def session_login_required(view_func):
@@ -22,8 +23,6 @@ def session_login_required(view_func):
 
 def homePage(request):
     signup_form = UserSignupForm()
-    from notes.models import Note
-    from users.models import User
     notes_count = Note.objects.filter(deleteFlag=False).count()
     users_count = User.objects.filter(deleteFlag=False).count()
     # Count all comments from all notes
@@ -42,13 +41,15 @@ def signup_view(request):
         form = UserSignupForm(request.POST)
         if form.is_valid():
             form.save()
-            return JsonResponse({'success': True}) 
+            return JsonResponse({'success': True})
         else:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400) 
+            return JsonResponse(
+                {'success': False, 'errors': form.errors},
+                status=400
+            )
     else:
         form = UserSignupForm()
     return render(request, 'users/index.html', {'form': form})
-
 
 
 def signin_view(request):
@@ -56,13 +57,19 @@ def signin_view(request):
         form = UserSigninForm(request.POST)
         if form.is_valid():
             user = form.user
-            request.session['user_id'] = user.id 
+            request.session['user_id'] = user.id
             request.session['fullName'] = user.fullName.split()[0]
-            return JsonResponse({'success': True, 'reload': True}) 
+            return JsonResponse({'success': True, 'reload': True})
         else:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+            return JsonResponse(
+                {'success': False, 'errors': form.errors},
+                status=400
+            )
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method.'}, status=405)
+    return JsonResponse(
+        {'success': False, 'error': 'Invalid request method.'},
+        status=405
+    )
 
 
 def logout_view(request):
@@ -73,4 +80,4 @@ def logout_view(request):
 @session_login_required
 def aboutus_view(request):
     signup_form = UserSignupForm()
-    return render(request, "about-us/contact.html",{"form": signup_form})
+    return render(request, "about-us/contact.html", {"form": signup_form})

@@ -7,10 +7,13 @@ import re
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
 
+
 class UserSignupForm(forms.ModelForm):
     rePassword = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'placeholder': 'تکرار رمز عبور', 'class': 'form-control', 'required': True
+            'placeholder': 'تکرار رمز عبور',
+            'class': 'form-control',
+            'required': True
         })
     )
 
@@ -19,16 +22,25 @@ class UserSignupForm(forms.ModelForm):
         fields = ['password', 'email', 'fullName', 'phoneNumber']
         widgets = {
             'password': forms.PasswordInput(attrs={
-                'placeholder': 'رمز عبور', 'class': 'form-control', 'required': True
+                'placeholder': 'رمز عبور',
+                'class': 'form-control',
+                'required': True
             }),
             'email': forms.EmailInput(attrs={
-                'placeholder': 'ایمیل', 'class': 'form-control', 'required': True, 'style': 'direction: rtl;'
+                'placeholder': 'ایمیل',
+                'class': 'form-control',
+                'required': True,
+                'style': 'direction: rtl;'
             }),
             'fullName': forms.TextInput(attrs={
-                'placeholder': 'نام', 'class': 'form-control', 'required': True
+                'placeholder': 'نام',
+                'class': 'form-control',
+                'required': True
             }),
             'phoneNumber': forms.TextInput(attrs={
-                'placeholder': 'شماره تماس', 'class': 'form-control', 'required': True
+                'placeholder': 'شماره تماس',
+                'class': 'form-control',
+                'required': True
             }),
         }
 
@@ -58,9 +70,10 @@ class UserSignupForm(forms.ModelForm):
         if not re.match(r'^09\d{9}$', phone_number):
             raise ValidationError("شماره تماس باید یک شماره معتبر ایرانی باشد.")
         return phone_number
+
     def clean_fullName(self):
         full_name = self.cleaned_data.get('fullName')
-        
+
         # Check if the name contains any digits
         if re.search(r'\d', full_name):
             raise ValidationError("نام نمی‌تواند شامل اعداد باشد.")
@@ -93,6 +106,7 @@ class UserSignupForm(forms.ModelForm):
 class UserSigninForm(forms.Form):
     email = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
+
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')

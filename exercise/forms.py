@@ -1,21 +1,24 @@
 from django import forms
 from bson import ObjectId
+from .models import Exercise
+
 
 class AudioUploadForm(forms.Form):
     reference_audio = forms.FileField(
         label='بارگذاری قطعه مرجع',
         required=False,
-        widget=forms.ClearableFileInput(attrs={'accept': 'audio/*',  'id': 'id_reference_audio'})
+        widget=forms.ClearableFileInput(
+            attrs={'accept': 'audio/*', 'id': 'id_reference_audio'}
+        )
     )
     user_audio = forms.FileField(
         label='بارگذاری ضبط تمرین شما',
         required=False,
-        widget=forms.ClearableFileInput(attrs={'accept': 'audio/*',  'id': 'id_user_audio'})
+        widget=forms.ClearableFileInput(
+            attrs={'accept': 'audio/*', 'id': 'id_user_audio'}
+        )
     )
-    
-    
-from django import forms
-from .models import Exercise
+
 
 class ExerciseCreateForm(forms.ModelForm):
     class Meta:
@@ -25,7 +28,7 @@ class ExerciseCreateForm(forms.ModelForm):
             "title": forms.TextInput(
                 attrs={
                     "placeholder": "عنوان تمرین",
-                    "class": "auth-input",  # or form-control if that’s your CSS
+                    "class": "auth-input",
                     "id": "title",
                     "dir": "auto",
                 }
@@ -34,7 +37,7 @@ class ExerciseCreateForm(forms.ModelForm):
         labels = {
             "title": "",
         }
-        
+
     def save(self, commit=True):
         exercise = super().save(commit=False)
         exercise.id = str(ObjectId())

@@ -2,7 +2,6 @@ from django.shortcuts import render
 from users.forms import UserSignupForm
 import joblib
 import pandas as pd
-import numpy as np
 import os
 from django.conf import settings
 import ast
@@ -16,6 +15,7 @@ ordinal_encoder = pipeline["ordinal_encoder"]
 color_binarizer = pipeline["color_binarizer"]
 finish_binarizer = pipeline["finish_binarizer"]
 
+
 # Create your views here.
 @session_login_required
 def estimator_view(request):
@@ -23,6 +23,7 @@ def estimator_view(request):
     signup_form = UserSignupForm()
     prediction = None
     df = pd.read_csv("data.csv")
+
     def safe_parse(val):
         try:
             return ast.literal_eval(val)
@@ -62,14 +63,14 @@ def estimator_view(request):
         input_df = pd.DataFrame([{
             "brand": brand,
             "model": model_name,
-            "color_array": [material],  
-            "finish": [finish],         
+            "color_array": [material],
+            "finish": [finish],
             "dimension": float(dimension),
-            "type_grand" : type_grand,
-            "type_vertical" : type_vertical
+            "type_grand": type_grand,
+            "type_vertical": type_vertical
         }])
         processed = preprocess_input(input_df)
-        prediction = int(model.predict(processed)[0]* dollar_price)
+        prediction = int(model.predict(processed)[0] * dollar_price)
     return render(request, "estimator/estimator.html", {
         "form": signup_form,
         "brands": brands,
@@ -80,6 +81,7 @@ def estimator_view(request):
         "prediction": prediction
     })
 
+
 def preprocess_input(df):
     def safe_parse(val):
         try:
@@ -89,7 +91,9 @@ def preprocess_input(df):
     df = df.copy()
     for i, col in enumerate(["brand", "model"]):
         known_classes = list(ordinal_encoder.categories_[i])
-        df[col] = df[col].apply(lambda x: x if x in known_classes else "<unknown>")
+        df[col] = df[col].apply(
+            lambda x: x if x in known_classes else "<unknown>"
+        )
 
     df[["brand", "model"]] = ordinal_encoder.transform(df[["brand", "model"]])
 
@@ -107,5 +111,10 @@ def preprocess_input(df):
         index=df.index
     )
 
-    df = pd.concat([df.drop(["color_array", "finish"], axis=1), color_encoded, finish_encoded], axis=1)
+    df = pd.concat(
+        [df.drop(["color_array", "finish"], axis=1),
+         color_encoded,
+         finish_encoded],
+        axis=1
+    )
     return df

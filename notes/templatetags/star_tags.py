@@ -1,8 +1,9 @@
 from django import template
-from datetime import datetime, timedelta, timezone as dt_timezone
+from datetime import datetime, timezone as dt_timezone
 from django.utils import timezone
 
 register = template.Library()
+
 
 @register.filter
 def star_class(rate, index):
@@ -13,13 +14,15 @@ def star_class(rate, index):
         return "bi-star-half"
     else:
         return "bi-star"
-    
+
+
 def to_persian_digits(value):
     persian_digits = {
         '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴',
         '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'
     }
     return ''.join(persian_digits.get(char, char) for char in str(value))
+
 
 @register.filter
 def persian_timesince(value):
@@ -57,6 +60,7 @@ def persian_timesince(value):
         months = seconds // 2592000
         result = f'{to_persian_digits(months)} ماه پیش'
     return result
+
 
 register.filter('to_persian_digits', to_persian_digits)
 register.filter('persian_timesince', persian_timesince)

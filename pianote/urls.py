@@ -37,11 +37,23 @@ urlpatterns = [
     path('notes/<str:note_id>/', notes_view.note_detail_view, name='note-detail'),
     path("price-estimator/", estimator_view.estimator_view, name="estimator"),
     path("exercise/", exercise_view.exercise_view, name="exercise"),
-    path("exercise/ajax/upload_reference/", exercise_view.ajax_upload_reference_audio, name="ajax_upload_reference"),
-    path("exercise/ajax/metrics/<str:exercise_id>/", exercise_view.ajax_exercise_metrics, name="ajax_exercise_metrics"),
+    path(
+        "exercise/ajax/upload_reference/",
+        exercise_view.ajax_upload_reference_audio,
+        name="ajax_upload_reference"
+    ),
+    path(
+        "exercise/ajax/metrics/<str:exercise_id>/",
+        exercise_view.ajax_exercise_metrics,
+        name="ajax_exercise_metrics"
+    ),
     path("price-estimator/", estimator_view.estimator_view, name="estimator"),
-    path("exercises/create/", exercise_view.exercise_create, name="exercise_create"),
-    path("exercise/", include("exercise.urls")), # <-- add this line
+    path(
+        "exercises/create/",
+        exercise_view.exercise_create,
+        name="exercise_create"
+    ),
+    path("exercise/", include("exercise.urls")),  #  <-- add this line
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
