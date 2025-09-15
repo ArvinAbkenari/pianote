@@ -1,24 +1,19 @@
 $(document).ready(function() {
-    // Theme toggle functionality
     const themeToggle = $('.theme-toggle');
     const moonIcon = 'bi-moon-fill';
     const sunIcon = 'bi-sun-fill';
 
-    // Sheet music filtering functionality
     $('.filter-list a').on('click', function(e) {
         e.preventDefault();
         const filterSection = $(this).closest('.filter-section');
         filterSection.find('a').removeClass('active');
         $(this).addClass('active');
 
-        // Here you can add actual filtering logic
-        // For now, just adding visual feedback
         const filterType = filterSection.find('h4').text();
         const filterValue = $(this).text();
         console.log(`Filtering ${filterType} by: ${filterValue}`);
     });
 
-    // Sheet card hover animation
     $('.sheet-card').hover(
         function() { $(this).addClass('hover'); },
         function() { $(this).removeClass('hover'); }
@@ -33,15 +28,14 @@ $(document).ready(function() {
         }
     }
 
-    // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         $('html').attr('data-theme', 'dark');
         themeToggle.find('i').removeClass(moonIcon).addClass(sunIcon);
     }
-    updateLogo(); // Ensure logo updates on page load
+    updateLogo(); 
 
-    // Handle theme toggle click
+    
     themeToggle.on('click', function() {
         const html = $('html');
         const icon = $(this).find('i');
@@ -55,10 +49,10 @@ $(document).ready(function() {
             icon.removeClass(moonIcon).addClass(sunIcon);
             localStorage.setItem('theme', 'dark');
         }
-        updateLogo(); // Update logo when theme changes
+        updateLogo(); 
     });
 
-    // Smooth scrolling for navigation links
+    
     $('a[href^="#"]').on('click', function(e) {
         e.preventDefault();
         const target = $(this).attr('href');
@@ -67,7 +61,7 @@ $(document).ready(function() {
         }, 800);
     });
 
-    // Counter animation for statistics
+    
     function animateCounter(element) {
         const target = parseInt($(element).text());
         $({ count: 0 }).animate({ count: target }, {
@@ -82,7 +76,6 @@ $(document).ready(function() {
         });
     }
 
-    // Start counter animation when element comes into view
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -96,7 +89,6 @@ $(document).ready(function() {
         observer.observe(this);
     });
 
-    // Sticky header behavior
     let lastScroll = 0;
     $(window).scroll(function() {
         const currentScroll = $(this).scrollTop();
@@ -108,7 +100,6 @@ $(document).ready(function() {
         lastScroll = currentScroll;
     });
 
-    // FAQ Accordion custom behavior
     $('.accordion-button').on('click', function() {
         const isCollapsed = $(this).hasClass('collapsed');
         $('.accordion-button').not(this).addClass('collapsed');
@@ -117,7 +108,6 @@ $(document).ready(function() {
         }
     });
 
-    // Add hover effect to social icons
     $('.social-icons a').hover(
         function() { $(this).addClass('hover'); },
         function() { $(this).removeClass('hover'); }
@@ -132,7 +122,6 @@ $(document).ready(function() {
         }
     });
 
-    // Ensure dropdowns don't interfere with page scrollability
     $(document).on('show.bs.dropdown', function () {
         $('body').css('overflow', 'auto');
     });
