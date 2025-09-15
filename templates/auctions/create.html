@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ایجاد حراج جدید{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'auctions/auctions.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container auction-container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="card-title text-center fw-bold mb-4">ایجاد حراج جدید</h2>
+          <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors.as_text }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+              {{ form.description }}
+              {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors.as_text }}</div>{% endif %}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.starting_price.id_for_label }}" class="form-label">{{ form.starting_price.label }}</label>
+                {{ form.starting_price }}
+                {% if form.starting_price.errors %}<div class="invalid-feedback d-block">{{ form.starting_price.errors.as_text }}</div>{% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="id_duration_hours" class="form-label">مدت زمان (ساعت)</label>
+                <input type="number" name="duration_hours" value="24" class="form-control" min="1" id="id_duration_hours">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+              {{ form.image }}
+              {% if form.image.errors %}<div class="invalid-feedback d-block">{{ form.image.errors.as_text }}</div>{% endif %}
+            </div>
+
+            <div class="d-grid">
+              <button class="btn btn-primary btn-lg" type="submit">ایجاد حراج</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

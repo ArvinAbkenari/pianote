@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ auction.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'auctions/auctions.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container auction-container py-5">
+  <div class="card auction-detail-card shadow-lg">
+    <div class="card-body p-lg-5">
+      <div class="row">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+          {% if auction.image %}
+            <img src="{{ auction.image.url }}" class="img-fluid detail-img w-100">
+          {% else %}
+            <img src="https://via.placeholder.com/600x400.png?text=No+Image" class="img-fluid detail-img w-100">
+          {% endif %}
+        </div>
+        <div class="col-lg-6 d-flex flex-column">
+          <h1 class="fw-bold">{{ auction.title }}</h1>
+          <p class="auction-description">{{ auction.description }}</p>
+          
+          <hr>
+
+          <div class="d-flex justify-content-between align-items-center  p-3 rounded-3 mb-3 auction-price-box">
+            <div class="text-center">
+              <h5 class="mb-1 price-label">قیمت فعلی</h5>
+              <strong id="currentPrice" class="fs-4 text-success price-value">{{ auction.current_price }} تومان</strong>
+            </div>
+            <div class="text-center">
+              <h5 class="mb-1 price-label">پایان حراجی در</h5>
+              <span id="expiresAt" class="fs-4 text-danger auction-timer" data-expires="{{ auction.expires_at|date:'c' }}"></span>
+            </div>
+          </div>
+
+          {% if auction.is_expired %}
+            <div class="alert alert-danger text-center">این حراج به پایان رسیده است.</div>
+          {% else %}
+            <form id="bidForm" onsubmit="return false;" class="mb-3">
+              {% csrf_token %}
+              <div class="input-group  mb-2">
+                {{ bid_form.amount }}
+                <button type="button" class="btn btn-success" id="placeBidBtn">ثبت پیشنهاد</button>
+              </div>
+              {% if bid_form.amount.errors %}<div class="invalid-feedback d-block">{{ bid_form.amount.errors.as_text }}</div>{% endif %}
+            </form>
+          {% endif %}
+
+          {% if is_seller and not auction.is_expired %}
+          <div class="card border-0 mt-auto seller-actions">
+            <div class="card-body">
+              <h5 class="card-title">عملیات فروشنده</h5>
+              <p class="card-text small">به عنوان فروشنده، می‌توانید بالاترین پیشنهاد را بپذیرید یا به صورت دستی یک برنده انتخاب کنید.</p>
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" id="acceptHighest">پذیرفتن بالاترین پیشنهاد</button>
+                <div class="input-group">
+                  <select id="manualChoose" class="form-select">
+                    <option value="">انتخاب دستی یک پیشنهاد...</option>
+                    {% for b in bids %}
+                      <option value="{{ b.id }}">{{ b.bidder.fullName }} - {{ b.amount }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="button" class="btn btn-secondary" id="chooseBtn">انتخاب</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4 class="mb-0">تاریخچه پیشنهادها</h4>
+    </div>
+    <div class="card-body p-0">
+      <ul class="list-group list-group-flush bids-history" id="bidsList">
+        {% for b in bids %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-person-circle me-2"></i>{{ b.bidder.fullName }}</span>
+            <span class="fw-bold">{{ b.amount }} تومان</span>
+            <small>{{ b.created_at|timesince }} قبل</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-center" id="noBidsMessage">هیچ پیشنهادی ثبت نشده است.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function startCountdown() {
+    const el = document.getElementById('expiresAt');
+    if (!el) return;
+    const expires = new Date(el.dataset.expires);
+
+    function update() {
+      const now = new Date();
+      const diff = expires - now;
+      if (diff <= 0) {
+        el.innerText = 'پایان یافته';
+        if(document.getElementById('placeBidBtn')) document.getElementById('placeBidBtn').disabled = true;
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / 1000 / 60) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+      
+      let output = '';
+      if (days > 0) output += `${days} روز و `;
+      output += `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      el.innerText = output;
+    }
+    update();
+    setInterval(update, 1000);
+  }
+  startCountdown();
+
+  (function(){
+    const btn = document.getElementById('placeBidBtn');
+    if(!btn) return;
+    btn.onclick = async function(){
+      const form = document.getElementById('bidForm');
+      const amountInput = form.querySelector('[name=amount]');
+      if (!amountInput || isNaN(parseFloat(amountInput.value)) || parseFloat(amountInput.value) <= 0) {
+          alert('لطفا مقدار پیشنهادی معتبر وارد کنید');
+          return;
+      }
+
+      const data = new FormData(form);
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch("{% url 'auctions:place_bid' auction.id %}", {
+          method: 'POST',
+          headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+          body: data
+        });
+        const result = await resp.json();
+
+        if (!resp.ok || !result.success) {
+          alert(result.error || 'خطا در ثبت پیشنهاد.');
+        } else {
+          document.getElementById('currentPrice').innerText = result.bid.amount + ' تومان';
+          amountInput.value = '';
+          const bidsList = document.getElementById('bidsList');
+          document.getElementById('noBidsMessage')?.remove();
+          const newBidEl = document.createElement('li');
+          newBidEl.className = 'list-group-item d-flex justify-content-between align-items-center';
+          newBidEl.innerHTML = `<span><i class="bi bi-person-circle me-2"></i>${result.bid.bidder_name}</span> <span class="fw-bold">${result.bid.amount} تومان</span> <small>همین الان</small>`;
+          bidsList.prepend(newBidEl);
+        }
+      } catch (e) {
+        console.error('Bid submission error', e);
+        alert('یک خطای غیرمنتظره رخ داد.');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+  })();
+
+  document.getElementById('acceptHighest')?.addEventListener('click', function(){
+    if(!confirm('آیا از پذیرفتن بالاترین پیشنهاد اطمینان دارید؟')) return;
+    fetch("{% url 'auctions:choose_bidder' auction.id %}", {
+      method: 'POST',
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+    }).then(r=>r.json()).then(j=>{ if(j.success) location.reload(); else alert(j.error||'خطا'); });
+  });
+
+  document.getElementById('chooseBtn')?.addEventListener('click', function(){
+    const sel = document.getElementById('manualChoose');
+    if(!sel.value) return alert('یک پیشنهاد را برای انتخاب انتخاب کنید');
+    if(!confirm('آیا از انتخاب این پیشنهاد به عنوان برنده اطمینان دارید؟')) return;
+    const body = new FormData(); body.append('bid_id', sel.value);
+    fetch("{% url 'auctions:choose_bidder' auction.id %}", {
+      method: 'POST',
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+      body: body
+    }).then(r=>r.json()).then(j=>{ if(j.success) location.reload(); else alert(j.error||'خطا'); });
+  });
+</script>
+{% endblock %}
