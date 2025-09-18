@@ -90,6 +90,76 @@
     </div>
   {% endif %}
 
+  <!-- Expired Auctions -->
+  <div class="mt-5">
+    <h3 class="fw-bold border-bottom pb-2 mb-4">حراج‌های پایان یافته</h3>
+    <div class="row">
+      {% for a in expired_auctions %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card auction-card h-100 auction-expired">
+            <div style="position: relative;">
+              {% if a.image %}
+                <img src="{{ a.image.url }}" class="card-img-top" alt="{{ a.title }}">
+              {% else %}
+                <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="No image available">
+              {% endif %}
+              <div class="auction-status-overlay">پایان یافته</div>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ a.title }}</h5>
+              <p class="card-text">{{ a.description|truncatechars:100 }}</p>
+              <div class="mt-auto">
+                <p class="card-text fs-5 fw-bold mb-2">قیمت نهایی: <span class="text-muted">{{ a.current_price|three_comma }} تومان</span></p>
+                <a href="{% url 'auctions:detail' a.id %}" class="btn btn-outline-secondary w-100">مشاهده جزئیات</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-secondary text-center">
+            <p>هیچ حراج پایان یافته‌ای وجود ندارد.</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Sold Auctions -->
+  <div class="mt-5">
+    <h3 class="fw-bold border-bottom pb-2 mb-4">حراج‌های فروخته شده</h3>
+    <div class="row">
+      {% for a in sold_auctions %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card auction-card h-100 auction-sold">
+             <div style="position: relative;">
+              {% if a.image %}
+                <img src="{{ a.image.url }}" class="card-img-top" alt="{{ a.title }}">
+              {% else %}
+                <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="No image available">
+              {% endif %}
+              <div class="auction-status-overlay sold">فروخته شد</div>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ a.title }}</h5>
+              <p class="card-text">{{ a.description|truncatechars:100 }}</p>
+              <div class="mt-auto">
+                <p class="card-text fs-5 fw-bold mb-2">قیمت فروش: <span class="text-success">{{ a.chosen_bid.amount|three_comma }} تومان</span></p>
+                <a href="{% url 'auctions:detail' a.id %}" class="btn btn-outline-info w-100">مشاهده جزئیات</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-secondary text-center">
+            <p>هیچ حراج فروخته شده‌ای وجود ندارد.</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}
 

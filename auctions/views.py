@@ -6,20 +6,34 @@ from .forms import AuctionCreateForm, BidForm
 from users.views import session_login_required
 from users.models import User
 import secrets
+from django.db.models import Q
 
 
 def auction_list(request):
     user_id = request.session.get('user_id')
-    all_auctions = Auction.objects.filter(is_closed=False).order_by('-created_at')
+    now = timezone.now()
+
+    # Active auctions
+    active_auctions = Auction.objects.filter(is_closed=False, expires_at__gt=now).order_by('-created_at')
+
+    # Expired auctions
+    expired_auctions = Auction.objects.filter(
+        (Q(is_closed=True) & Q(chosen_bid__isnull=True)) |
+        (Q(is_closed=False) & Q(expires_at__lte=now))
+    ).order_by('-created_at')
+
+    # Sold auctions
+    sold_auctions = Auction.objects.filter(is_closed=True, chosen_bid__isnull=False).order_by('-created_at')
+
 
     user_auctions = None
-    other_auctions = all_auctions
+    other_auctions = active_auctions
 
     if user_id:
         try:
             user = User.objects.get(id=user_id)
-            user_auctions = all_auctions.filter(seller=user)
-            other_auctions = all_auctions.exclude(seller=user)
+            user_auctions = active_auctions.filter(seller=user)
+            other_auctions = active_auctions.exclude(seller=user)
         except User.DoesNotExist:
             # Handle case where user_id in session is invalid
             pass
@@ -27,6 +41,8 @@ def auction_list(request):
     context = {
         'user_auctions': user_auctions,
         'other_auctions': other_auctions,
+        'expired_auctions': expired_auctions,
+        'sold_auctions': sold_auctions,
     }
     return render(request, 'auctions/list.html', context)
 

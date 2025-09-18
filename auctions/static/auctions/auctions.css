@@ -179,3 +179,27 @@
     color: var(--text-primary);
     background-color: var(--bg-primary);
 }
+
+/* Styles for expired and sold auctions */
+.auction-expired .card-img-top,
+.auction-sold .card-img-top {
+    filter: grayscale(80%);
+}
+
+.auction-status-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.auction-status-overlay.sold {
+    background-color: rgba(25, 135, 84, 0.7); /* Bootstrap success color with alpha */
+}
