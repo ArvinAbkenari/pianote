@@ -27,8 +27,15 @@ SECRET_KEY = "django-insecure-ujl^q)ajz@+wd1a3d*6@784y)6p!eyw!xs#ciw47(oq^u+h51c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['unconsultative-unmuddled-azariah.ngrok-free.app']
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+# When serving via a tunnel/proxy like ngrok, add the tunnel domain to CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = ['https://unconsultative-unmuddled-azariah.ngrok-free.app']
+
+# If ngrok or another proxy forwards headers, allow Django to use the X-Forwarded-Host
+USE_X_FORWARDED_HOST = True
+# Let Django know the original request scheme when behind a TLS-terminating proxy (ngrok)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
