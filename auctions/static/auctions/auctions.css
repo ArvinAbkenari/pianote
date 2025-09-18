@@ -172,4 +172,10 @@
 
 #id_title,#id_description{
     background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+#id_title:focus, #id_description:focus, #id_starting_price:focus, #id_duration_hours:focus{
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
 }

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+{% load number_filters %}
 
 {% block title %}آیتم‌های حراج{% endblock %}
 
@@ -10,46 +12,84 @@
 {% block content %}
 <div class="container auction-container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">آیتم‌های حراج فعال</h2>
+    <h2 class="fw-bold">آیتم‌های حراج</h2>
     <a href="{% url 'auctions:create' %}" class="btn btn-primary">ایجاد حراج جدید <i class="bi bi-plus-lg ms-1"></i></a>
   </div>
 
-  <div class="row">
-    {% for a in auctions %}
-      <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card auction-card h-100">
-          <div style="position: relative;">
-            {% if a.image %}
-              <img src="{{ a.image.url }}" class="card-img-top" alt="{{ a.title }}">
-            {% else %}
-              <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="No image available">
-            {% endif %}
-            <div class="auction-countdown" data-expires="{{ a.expires_at|date:'c' }}"></div>
+  {% if user_auctions %}
+    <div class="mb-5">
+      <h3 class="fw-bold border-bottom pb-2 mb-4">حراج‌های شما</h3>
+      <div class="row">
+        {% for a in user_auctions %}
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card auction-card h-100">
+              <div style="position: relative;">
+                {% if a.image %}
+                  <img src="{{ a.image.url }}" class="card-img-top" alt="{{ a.title }}">
+                {% else %}
+                  <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="No image available">
+                {% endif %}
+                <div class="auction-countdown" data-expires="{{ a.expires_at|date:'c' }}"></div>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ a.title }}</h5>
+                <p class="card-text">{{ a.description|truncatechars:100 }}</p>
+                <div class="mt-auto">
+                  <p class="card-text fs-5 fw-bold mb-2">قیمت فعلی: <span class="text-success">{{ a.current_price|three_comma }} تومان</span></p>
+                  <a href="{% url 'auctions:detail' a.id %}" class="btn btn-outline-primary w-100">مشاهده و مدیریت</a>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ a.title }}</h5>
-            <p class="card-text">{{ a.description|truncatechars:100 }}</p>
-            <div class="mt-auto">
-              <p class="card-text fs-5 fw-bold mb-2">قیمت فعلی: <span class="text-success">{{ a.current_price }} تومان</span></p>
-              {% if a.id %}
-                <a href="{% url 'auctions:detail' a.id %}" class="btn btn-outline-primary w-100">مشاهده و پیشنهاد</a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div>
+    <h3 class="fw-bold border-bottom pb-2 mb-4">سایر حراج‌های فعال</h3>
+    <div class="row">
+      {% for a in other_auctions %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card auction-card h-100">
+            <div style="position: relative;">
+              {% if a.image %}
+                <img src="{{ a.image.url }}" class="card-img-top" alt="{{ a.title }}">
               {% else %}
-                <button class="btn btn-outline-secondary w-100" disabled>مشاهده</button>
+                <img src="https://via.placeholder.com/300x200.png?text=No+Image" class="card-img-top" alt="No image available">
               {% endif %}
+              <div class="auction-countdown" data-expires="{{ a.expires_at|date:'c' }}"></div>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ a.title }}</h5>
+              <p class="card-text">{{ a.description|truncatechars:100 }}</p>
+              <div class="mt-auto">
+                <p class="card-text fs-5 fw-bold mb-2">قیمت فعلی: <span class="text-success">{{ a.current_price|three_comma }} تومان</span></p>
+                <a href="{% url 'auctions:detail' a.id %}" class="btn btn-outline-primary w-100">مشاهده و پیشنهاد</a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    {% empty %}
-      <div class="col-12">
-        <div class="alert alert-secondary text-center">
-          <p class="h4">هیچ حراج فعالی وجود ندارد.</p>
-          <p>شما می‌توانید اولین نفر باشید!</p>
-          <a href="{% url 'auctions:create' %}" class="btn btn-success mt-2">ایجاد حراج</a>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-secondary text-center">
+            <p class="h4">در حال حاضر هیچ حراج فعالی از دیگران وجود ندارد.</p>
+          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
+
+  {% if not user_auctions and not other_auctions %}
+    <div class="col-12 mt-4">
+      <div class="alert alert-info text-center">
+        <p class="h4">هیچ حراج فعالی وجود ندارد.</p>
+        <p>شما می‌توانید اولین نفر باشید!</p>
+        <a href="{% url 'auctions:create' %}" class="btn btn-success mt-2">ایجاد حراج</a>
+      </div>
+    </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 

@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class AuctionCreateForm(forms.ModelForm):
-    duration_hours = forms.IntegerField(min_value=1, initial=24, help_text='Duration in hours')
+    duration_hours = forms.IntegerField(min_value=1, initial=24, help_text='Duration in hours', label="مدت زمان (ساعت)")
 
     class Meta:
         model = Auction
@@ -14,6 +14,12 @@ class AuctionCreateForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'starting_price': forms.NumberInput(attrs={'class': 'form-control'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'title': "عنوان",
+            'description': "توضیحات",
+            'image': "تصویر",
+            'starting_price': "قیمت اولیه",
         }
 
     def save(self, seller, commit=True):

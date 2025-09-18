@@ -9,8 +9,26 @@ import secrets
 
 
 def auction_list(request):
-    auctions = Auction.objects.filter(is_closed=False)
-    return render(request, 'auctions/list.html', {'auctions': auctions})
+    user_id = request.session.get('user_id')
+    all_auctions = Auction.objects.filter(is_closed=False).order_by('-created_at')
+
+    user_auctions = None
+    other_auctions = all_auctions
+
+    if user_id:
+        try:
+            user = User.objects.get(id=user_id)
+            user_auctions = all_auctions.filter(seller=user)
+            other_auctions = all_auctions.exclude(seller=user)
+        except User.DoesNotExist:
+            # Handle case where user_id in session is invalid
+            pass
+
+    context = {
+        'user_auctions': user_auctions,
+        'other_auctions': other_auctions,
+    }
+    return render(request, 'auctions/list.html', context)
 
 
 @session_login_required
